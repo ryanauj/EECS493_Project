@@ -1,4 +1,4 @@
-package eecs493project.findme;
+package com.example.rj.findme;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
