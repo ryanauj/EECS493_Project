@@ -15,13 +15,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="horizontal"
-        android:divider="#1d1f9e">
+        android:orientation="horizontal">
         <fragment
-            android:id="@+id/map"
+            android:id="@+id/mapFrag"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:name="com.google.android.gms.maps.MapFragment"
         />
     </LinearLayout>
     <ListView xmlns:android="http://schemas.android.com/apk/res/android"
