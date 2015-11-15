@@ -1,30 +1,41 @@
 package otk.test;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener{
 
     private GoogleMap mMap;
+    private GoogleApiClient ourClient;
+    private Location prevLocation;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
+        MapFragment mapFragment = (MapFragment) getFragmentManager()
+                .findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(this);
+        /* {
+            @Override
+            public void onMapLongClick(LatLng point) {
+
+                mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
+            }
+        });*/
     }
 
 
@@ -47,10 +58,31 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         sydney = new LatLng(34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker somewhere"));
+        mMap.setMyLocationEnabled(true);
+
+        //ourClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
     }
 
+    @Override
     public void onMapClick(LatLng point)
     {
         mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point)
+    {
+        mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
+    }
+
+    public void GetMyLoc()
+    {
+        prevLocation = LocationServices.FusedLocationApi.getLastLocation(ourClient);
+        if(prevLocation != null)
+        {
+
+            LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+        }
     }
 }

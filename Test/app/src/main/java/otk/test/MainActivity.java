@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
@@ -39,12 +41,9 @@ public class MainActivity extends AppCompatActivity  {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        MapFragment myFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        GoogleMap myMap = myFrag.getMap();
-        myMap.addMarker(new MarkerOptions().position(new LatLng(0,0)).title("My Marker"));
-
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);
+        mapFragment.getMap().setOnMapClickListener(mapClass);
     }
 
     @Override
