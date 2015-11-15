@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" tools:context="otk.test.Event_Details"
+    android:fillViewport="false">
+
+    <!-- Data structure:
+        Creator
+        Title
+        Description
+        Location
+            lat
+            long
+        Event time
+        Picture
+        Name of location
+    -->
+
+    <!-- set up layout and let Java fill in the details by ID -->
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:id="@+id/event_picture"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:background="#AAAAAA"/>
+
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="22dp"
+            android:text="This is the event's title."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"></LinearLayout>
+
+        <TextView
+            android:id="@+id/event_creator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="16dp"
+            android:text="This is the event's creator."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"></LinearLayout>
+
+        <TextView
+            android:id="@+id/event_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="16dp"
+            android:text="This is the event's time."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"></LinearLayout>
+
+        <TextView
+            android:id="@+id/event_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="16dp"
+            android:text="This is the event's location."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"></LinearLayout>
+
+        <TextView
+            android:id="@+id/event_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="14dp"
+            android:text="This is the event's description. Describe what is happening here. This textview should be allowed to span multiple lines inorder for large descriptions to be made."/>
+
+    </LinearLayout>
+
+</ScrollView>
