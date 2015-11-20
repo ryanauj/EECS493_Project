@@ -1,6 +1,7 @@
 package otk.test;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Date;
 
@@ -8,11 +9,11 @@ import java.util.Date;
  * Created by Andrew on 11/14/2015.
  */
 public class EventData {
+    private MarkerOptions location;
     private String creator, title, description, nameOfLocation, pictureUrl;
-    private LatLng location;
     private Date time;
 
-    EventData(String creator, String title, String description, String pictureUrl, LatLng location, Date time) {
+    EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location, Date time) {
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -29,7 +30,7 @@ public class EventData {
         this.description = description;
     }
 
-    public void setLocation(LatLng location) {
+    public void setLocation(MarkerOptions location) {
         this.location = location;
     }
 
@@ -57,7 +58,7 @@ public class EventData {
         return title;
     }
 
-    public LatLng getLocation() {
+    public MarkerOptions getLocation() {
         return location;
     }
 

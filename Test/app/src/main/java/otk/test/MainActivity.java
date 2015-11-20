@@ -2,6 +2,7 @@ package otk.test;
 
 import android.app.Fragment;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -44,6 +46,15 @@ public class MainActivity extends AppCompatActivity  {
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);
         mapFragment.getMap().setOnMapClickListener(mapClass);
+
+        Button createEvent = (Button) findViewById(R.id.createevent);
+        createEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, CreateEvent.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -68,9 +79,8 @@ public class MainActivity extends AppCompatActivity  {
         return super.onOptionsItemSelected(item);
     }
 
-    public void initMap()
-    {
-        MapFragment  mapFrag= (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
+    public void initMap() {
+        MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFrag.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(GoogleMap googleMap) {
