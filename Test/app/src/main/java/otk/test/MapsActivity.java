@@ -1,6 +1,13 @@
 package otk.test;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -21,6 +28,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private GoogleMap mMap;
     private GoogleApiClient ourClient;
     private Location prevLocation;
+    public Location curLocation;
+    public GoogleApiClient mGoogleApiClient;
+    public LocationManager mLocationManager;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,13 +62,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        prevLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(prevLocation!=null) {
+            LatLng cur_loc = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(cur_loc).title("Current Location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(cur_loc));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
 
-        sydney = new LatLng(34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker somewhere"));
         mMap.setMyLocationEnabled(true);
+        }
 
         //ourClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
     }
@@ -72,17 +84,53 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapLongClick(LatLng point)
     {
-        mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
+        mMap.addMarker(new MarkerOptions().position(point).title("Current Location"));
+
     }
 
     public void GetMyLoc()
     {
-        prevLocation = LocationServices.FusedLocationApi.getLastLocation(ourClient);
+        prevLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if(prevLocation != null)
         {
-
             LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
             mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
         }
+        else
+        {
+        }
     }
+
+    public boolean updateLastLoc(Location newLoc)
+    {
+        prevLocation = newLoc;
+        if(prevLocation != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public class LocationFailedDialog extends DialogFragment{
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the Builder class for convenient dialog construction
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setMessage("Location Failed To Load")
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // FIRE ZE MISSILES!
+                        }
+                    })
+                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    });
+            // Create the AlertDialog object and return it
+            return builder.create();
+        }
+    }
+
+
 }
