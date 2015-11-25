@@ -4,13 +4,17 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -23,11 +27,12 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener{
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener{
 
     private GoogleMap mMap;
     private GoogleApiClient ourClient;
     private Location prevLocation;
+    public String LocProvider;
     public Location curLocation;
     public GoogleApiClient mGoogleApiClient;
     public LocationManager mLocationManager;
@@ -39,13 +44,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(this);
-        /* {
-            @Override
-            public void onMapLongClick(LatLng point) {
-
-                mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-            }
-        });*/
     }
 
 
@@ -68,36 +66,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             mMap.addMarker(new MarkerOptions().position(cur_loc).title("Current Location"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(cur_loc));
             mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
-
-        mMap.setMyLocationEnabled(true);
+            mMap.setMyLocationEnabled(true);
         }
 
-        //ourClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
     }
 
     @Override
     public void onMapClick(LatLng point)
     {
-        mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-    }
-
-    @Override
-    public void onMapLongClick(LatLng point)
-    {
-        mMap.addMarker(new MarkerOptions().position(point).title("Current Location"));
-
     }
 
     public void GetMyLoc()
     {
-        prevLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if(prevLocation != null)
+        if(LocProvider!=null)
         {
-            LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
-        }
-        else
-        {
+            prevLocation = mLocationManager.getLastKnownLocation(LocProvider);
+            if (prevLocation != null) {
+                LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+            }
         }
     }
 
@@ -111,26 +98,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
-    public class LocationFailedDialog extends DialogFragment{
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            // Use the Builder class for convenient dialog construction
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setMessage("Location Failed To Load")
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // FIRE ZE MISSILES!
-                        }
-                    })
-                    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                        }
-                    });
-            // Create the AlertDialog object and return it
-            return builder.create();
-        }
-    }
 
 
 }

@@ -3,9 +3,11 @@ package otk.test;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateUtils;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,16 +28,24 @@ import java.util.Date;
 public class CreateEvent extends AppCompatActivity {
 
     public Calendar cal = Calendar.getInstance();
+    private LatLng tempLoc;
 
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
 
+        final EventData createEventData = ((MyApplication) this.getApplication()).getTempEvent();
+        tempLoc = createEventData.getLocation().getPosition();
+
         final EditText titleView = (EditText) findViewById(R.id.title);
+        titleView.setText(createEventData.getTitle());
         final EditText creatorView = (EditText) findViewById(R.id.creator);
+        creatorView.setText(createEventData.getCreator());
         final EditText descriptionView = (EditText) findViewById(R.id.description);
+        descriptionView.setText(createEventData.getDescription());
         final EditText locationView = (EditText) findViewById(R.id.location);
+        locationView.setText(createEventData.getLocation().getPosition().toString());
+
         TextView timeView = (TextView) findViewById(R.id.time);
         timeView.setText(getTimeString(cal));
         TextView dateView = (TextView) findViewById(R.id.date);
@@ -78,6 +90,18 @@ public class CreateEvent extends AppCompatActivity {
                 Log.e("creator", creatorView.getText().toString());
                 Log.e("description", descriptionView.getText().toString());
                 Log.e("location", locationView.getText().toString());
+
+                Date returnDate = new Date(cal.getTime().getTime());
+                createEventData.setCreator(creatorView.getText().toString());
+                createEventData.setDescription(descriptionView.getText().toString());
+                createEventData.setTime(returnDate);
+                createEventData.setTitle(titleView.getText().toString());
+                createEventData.setLocation(tempLoc);
+                ((MyApplication) getApplication()).setTempEvent(createEventData);
+
+                Intent intent = new Intent();
+                setResult(RESULT_OK,intent);
+                finish();
                 //Log.e("time", timeView.getHour()+" "+timeView.getMinute()+timeView.getBaseline());
                 //Log.e("date", dateView.getMonth() + " " + dateView.getDayOfMonth() + " " + dateView.getYear());
             }
@@ -102,6 +126,7 @@ public class CreateEvent extends AppCompatActivity {
                 setDate();
             }
         });
+
     }
 
     public void setTime() {

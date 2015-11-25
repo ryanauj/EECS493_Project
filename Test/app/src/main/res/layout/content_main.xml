@@ -22,16 +22,22 @@
             android:layout_height="match_parent"
             android:name="com.google.android.gms.maps.MapFragment"
         />
+        <Button
+        android:id="@+id/createevent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create Event"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:orientation="horizontal"
         android:layout_weight="1">
-        <Button
-            android:id="@+id/createevent"
+        <ListView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Create Event"/>
+            android:layout_height="match_parent"
+            android:id="@+id/eventListView">
+        </ListView>
     </LinearLayout>
 
 </LinearLayout>
