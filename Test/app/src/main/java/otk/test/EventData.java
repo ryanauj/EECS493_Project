@@ -91,4 +91,13 @@ public class EventData {
     public String getPictureUrl() {
         return pictureUrl;
     }
+
+    public String dataToString() {
+        return "title:" + this.title
+                + "\ncreator:" + this.creator
+                + "\ndescription:" + this.description
+                + "\nlocation:" + this.location.toString()
+                + "\ndatetime:" + this.time.toString()
+                + "\nimagepath" + this.pictureUrl;
+    }
 }

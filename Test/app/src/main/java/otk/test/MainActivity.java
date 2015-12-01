@@ -126,7 +126,17 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        adapter =new EventListAdapter(this,R.layout.event_list_card,eventListStorage);
+        //testconnection Button
+        Button testconnection = (Button) findViewById(R.id.testconnection);
+        testconnection.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, testconnection.class);
+                startActivity(intent);
+            }
+        });
+
+        adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
         ListView listView1 = (ListView) findViewById(R.id.eventListView);
         listView1.setAdapter(adapter);
 
