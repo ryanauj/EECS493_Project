@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements
         //Default is going to be null
         //If the event is null then don't fill anything
         //Once the event is adjusted by create event AND placed in the list, it will return to null to signify no waiting events
-        EventData initEvent = new EventData("Tim","Project Time","Working :/","/null",new MarkerOptions().position(new LatLng(0,0)).title("Project"), new Date());
+        EventData initEvent = new EventData("","","","/null",new MarkerOptions().position(new LatLng(0,0)).title(""), new Date());
         ((MyApplication) getApplication()).setTempEvent(initEvent);
         //eventListStorage.add(initEvent);
 
