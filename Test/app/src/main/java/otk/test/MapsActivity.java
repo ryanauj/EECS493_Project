@@ -1,8 +1,23 @@
 package otk.test;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.app.FragmentManager;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Location;
-import android.os.Bundle;
+
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.os.Vibrator;
 import android.support.v4.app.FragmentActivity;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Toast;
+
 
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -13,23 +28,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
-        GoogleMap.OnMapClickListener, GoogleMap.OnMapLongClickListener,
-        GoogleMap.OnMyLocationButtonClickListener {
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener{
 
     private GoogleMap mMap;
     private GoogleApiClient ourClient;
     private Location prevLocation;
-    private GoogleMap.OnMyLocationChangeListener myLocationChangeListener = new GoogleMap.OnMyLocationChangeListener() {
-        @Override
-        public void onMyLocationChange(Location location) {
-            LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-            mMap.addMarker(new MarkerOptions().position(loc).title("Point My Location"));
-            if(mMap != null){
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(loc, 16.0f));
-            }
-        }
-    };
+    public String LocProvider;
+    public Location curLocation;
+    public GoogleApiClient mGoogleApiClient;
+    public LocationManager mLocationManager;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,13 +45,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         MapFragment mapFragment = (MapFragment) getFragmentManager()
                 .findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(this);
-        /* {
-            @Override
-            public void onMapLongClick(LatLng point) {
-
-                mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-            }
-        });*/
     }
 
 
@@ -61,44 +61,46 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        prevLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(prevLocation!=null) {
+            LatLng cur_loc = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+            mMap.addMarker(new MarkerOptions().position(cur_loc).title("Current Location"));
+            mMap.moveCamera(CameraUpdateFactory.newLatLng(cur_loc));
+            mMap.animateCamera(CameraUpdateFactory.zoomTo(15));
+            mMap.setMyLocationEnabled(true);
+        }
 
-        sydney = new LatLng(34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker somewhere"));
-        mMap.setMyLocationEnabled(true);
-        mMap.setOnMyLocationChangeListener(myLocationChangeListener);
 
-        //ourClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
     }
 
     @Override
     public void onMapClick(LatLng point)
     {
-        mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-    }
-
-    @Override
-    public void onMapLongClick(LatLng point)
-    {
-        mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-    }
-
-    @Override
-    public boolean onMyLocationButtonClick() {
-        GetMyLoc();
-        return true;
     }
 
     public void GetMyLoc()
     {
-        prevLocation = LocationServices.FusedLocationApi.getLastLocation(ourClient);
-        if(prevLocation != null)
+        if(LocProvider!=null)
         {
-
-            LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+            prevLocation = mLocationManager.getLastKnownLocation(LocProvider);
+            if (prevLocation != null) {
+                LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));
+            }
         }
     }
+
+
+    public boolean updateLastLoc(Location newLoc)
+    {
+        prevLocation = newLoc;
+        if(prevLocation != null)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+
 }
