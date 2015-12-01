@@ -3,9 +3,12 @@ package otk.test;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuItem;
-
+import android.view.View;
+import android.view.Window;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -17,6 +20,7 @@ public class MainActivity extends AppCompatActivity  {
 
     private GoogleMap mMap;
     private MapsActivity mapClass = new MapsActivity();
+    private int windowHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,9 +29,26 @@ public class MainActivity extends AppCompatActivity  {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Log.d("APP STARTED", "HELLO");
+
+        windowHeight = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
+
+        View splitter = findViewById(R.id.layout_draggable);
+        splitter.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View v, DragEvent event) {
+                if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
+                    Log.d("ACTION_DRAG_LOCATION", Float.toString(event.getY()));
+                }
+                return true;
+            }
+        });
+
+
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);
         mapFragment.getMap().setOnMapClickListener(mapClass);
+        mapFragment.getMap().setOnMyLocationButtonClickListener(mapClass);
     }
 
     @Override
