@@ -1,6 +1,8 @@
 package otk.test;
 
+import android.content.ClipData;
 import android.view.DragEvent;
+import android.view.MotionEvent;
 import android.view.Window;
 
 import android.Manifest;
@@ -32,6 +34,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -102,16 +105,49 @@ public class MainActivity extends AppCompatActivity implements
         windowHeight = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
 
         View splitter = findViewById(R.id.layout_draggable);
+        /*
+        splitter.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                }
+                else if (event.getAction() == MotionEvent.ACTION_MOVE) {
+
+                }
+
+                return true;
+            }
+        });
+        */
+
+        splitter.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    ClipData data = ClipData.newPlainText("", "");
+                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
+                    v.startDrag(data, shadowBuilder, v, 0);
+                    v.setVisibility(View.INVISIBLE);
+                    Log.d("DRAG EVENT STARTED", "!!!!");
+                    return true;
+                }
+
+                return false;
+            }
+        });
         splitter.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View v, DragEvent event) {
                 if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
                     Log.d("ACTION_DRAG_LOCATION", Float.toString(event.getY()));
                 }
+                Log.d("DRAG EVENT", "!!!!");
                 return true;
             }
         });
 
+        Log.d("DRAG LISTENER SET", "---");
 
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
@@ -152,7 +188,15 @@ public class MainActivity extends AppCompatActivity implements
         ListView listView1 = (ListView) findViewById(R.id.eventListView);
         listView1.setAdapter(adapter);
 
-
+        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                EventData data = (EventData) parent.getItemAtPosition(position);
+                ((MyApplication) getApplication()).setTempEvent(data);
+                Intent intent = new Intent(MainActivity.this, Event_Details.class);
+                startActivity(intent);
+            }
+        });
 
         /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
             @Override

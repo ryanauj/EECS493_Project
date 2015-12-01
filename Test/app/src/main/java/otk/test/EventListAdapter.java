@@ -1,16 +1,13 @@
 package otk.test;
 
 import android.app.Activity;
-import android.app.usage.UsageEvents;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -20,12 +17,18 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
     Context context;
     int layoutResourceId;
     List<EventData> data=null;
+    public static final String EVENT_DATA_STRING = "EVENT_DATA_STRING";
 
     public EventListAdapter(Context context, int layoutResourceId, List<EventData> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+    }
+
+    @Override
+    public EventData getItem(int position) {
+        return data.get(position);
     }
 
     @Override

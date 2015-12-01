@@ -1,14 +1,9 @@
 package otk.test;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.Date;
 
 public class Event_Details extends AppCompatActivity {
 
@@ -18,7 +13,12 @@ public class Event_Details extends AppCompatActivity {
         setContentView(R.layout.activity_event_details);
 
         // testing sample
-        EventData sampleData = new EventData("Andrew","Beer Pong","Shooting some pong","/null",new MarkerOptions().position(new LatLng(0,0)).title("Beer Pong"), new Date());
+        //EventData sampleData = new EventData("Andrew","Beer Pong","Shooting some pong","/null",new MarkerOptions().position(new LatLng(0,0)).title("Beer Pong"), new Date());
+
+        //Intent intent = getIntent();
+        //EventData sampleData = intent.getParcelableExtra(EventListAdapter.EVENT_DATA_STRING);
+
+        EventData sampleData = new EventData(((MyApplication) this.getApplication()).getTempEvent());
 
         // find the xml views by id
         TextView creator = (TextView) findViewById(R.id.event_creator);

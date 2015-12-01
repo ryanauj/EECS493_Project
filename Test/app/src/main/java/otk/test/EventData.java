@@ -1,7 +1,5 @@
 package otk.test;
 
-import android.media.Image;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -91,4 +89,6 @@ public class EventData {
     public String getPictureUrl() {
         return pictureUrl;
     }
+
+
 }
