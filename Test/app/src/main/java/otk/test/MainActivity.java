@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
     private EventListAdapter adapter;
-    private List<EventData> eventListStorage = new LinkedList<EventData>();
+    //private List<EventData> eventListStorage = new LinkedList<EventData>();
 
     //All Google Map Variables
     private GoogleMap mMap;
@@ -207,23 +207,6 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(intent);
             }
         });
-
-        /*mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener(){
-            @Override
-            public void onMapLongClick(LatLng point)
-            {
-
-                mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
-
-                /*Intent intent = new Intent(MainActivity.this, CreateEvent.class);
-                startActivity(intent);*/
-          //  }
-        //});
-        //Initialize location
-       /* if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }*/
 
 
         //Build Google Client to communicate with google play services
@@ -383,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements
                 final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                 mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
 
-                eventListStorage.add(newEvent);
+                ((MyApplication) getApplication()).addToEventList(newEvent);
                 adapter.notifyDataSetChanged();
                //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
             }

@@ -4,10 +4,8 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.text.format.Time;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,8 +32,11 @@ public class CreateEvent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
 
-        final EventData createEventData = ((MyApplication) this.getApplication()).getTempEvent();
-        tempLoc = createEventData.getLocation().getPosition();
+
+        tempLoc = ((MyApplication) this.getApplication()).getTempEvent().getLocation().getPosition();
+
+        final EventData createEventData = new EventData();
+        createEventData.setLocation(tempLoc);
 
         final EditText titleView = (EditText) findViewById(R.id.title);
         titleView.setText(createEventData.getTitle());
@@ -96,7 +97,7 @@ public class CreateEvent extends AppCompatActivity {
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
-                createEventData.setLocation(tempLoc);
+                //createEventData.setLocation(tempLoc);
                 ((MyApplication) getApplication()).setTempEvent(createEventData);
 
                 Intent intent = new Intent();
