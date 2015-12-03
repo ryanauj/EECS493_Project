@@ -19,6 +19,8 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import org.w3c.dom.Text;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -39,13 +41,16 @@ public class CreateEvent extends AppCompatActivity {
         createEventData.setLocation(tempLoc);
 
         final EditText titleView = (EditText) findViewById(R.id.title);
-        titleView.setText(createEventData.getTitle());
-        final EditText creatorView = (EditText) findViewById(R.id.creator);
-        creatorView.setText(createEventData.getCreator());
+        final TextView creatorView = (TextView) findViewById(R.id.creator);
         final EditText descriptionView = (EditText) findViewById(R.id.description);
-        descriptionView.setText(createEventData.getDescription());
         final EditText locationView = (EditText) findViewById(R.id.location);
-        locationView.setText(createEventData.getLocation().getPosition().toString());
+        if(createEventData != null)
+        {
+            titleView.setText(createEventData.getTitle());
+            creatorView.setText(createEventData.getCreator());
+            descriptionView.setText(createEventData.getDescription());
+            locationView.setText(createEventData.getLocation().getPosition().toString());
+        }
 
         TextView timeView = (TextView) findViewById(R.id.time);
         timeView.setText(getTimeString(cal));
