@@ -9,7 +9,7 @@ import java.util.Date;
  * Created by Andrew on 11/14/2015.
  */
 public class EventData {
-    private MarkerOptions location;
+    private MarkerOptions location = new MarkerOptions();
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
 
@@ -32,6 +32,7 @@ public class EventData {
         this.nameOfLocation = replicateEvent.getNameOfLocation();
         this.time = replicateEvent.getTime();
         this.title = replicateEvent.getTitle();
+        this.location = replicateEvent.getLocation();
     }
 
     public void setCreator(String creator) {
