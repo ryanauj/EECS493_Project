@@ -182,17 +182,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        //Create Event Button
-        Button login = (Button) findViewById(R.id.login);
-        login.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-            }
-        });
-
-
         adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
         ListView listView1 = (ListView) findViewById(R.id.eventListView);
 
