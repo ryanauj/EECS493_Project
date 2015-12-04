@@ -9,8 +9,7 @@ import android.location.Geocoder;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.text.format.Time;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
@@ -53,7 +52,9 @@ public class CreateEvent extends AppCompatActivity {
         final EditText titleView = (EditText) findViewById(R.id.title);
         final TextView creatorView = (TextView) findViewById(R.id.creator);
         final EditText descriptionView = (EditText) findViewById(R.id.description);
+
         //final EditText locationView = (EditText) findViewById(R.id.location);
+
         if(createEventData != null)
         {
             titleView.setText(createEventData.getTitle());
@@ -103,12 +104,13 @@ public class CreateEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Log.e("click", "submit clicked");
                 Log.e("title", titleView.getText().toString());
-                Log.e("creator", creatorView.getText().toString());
+                //Log.e("creator", creatorView.getText().toString());
                 Log.e("description", descriptionView.getText().toString());
                 //Log.e("location", locationView.getText().toString());
 
                 Date returnDate = new Date(cal.getTime().getTime());
-                createEventData.setCreator(creatorView.getText().toString());
+                //createEventData.setCreator(creatorView.getText().toString());
+                createEventData.setCreator("Someone");
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
