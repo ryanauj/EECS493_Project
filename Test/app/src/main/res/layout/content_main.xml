@@ -39,11 +39,17 @@
         android:layout_height="0dp"
         android:layout_weight="0.5"
         android:orientation="horizontal">
-        <ListView
+        <!--<ListView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:id="@+id/eventListView">-->
+        <!--</ListView>-->
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/eventRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/eventListView">
-        </ListView>
+            android:scrollbars="vertical">
+        </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
 </LinearLayout>

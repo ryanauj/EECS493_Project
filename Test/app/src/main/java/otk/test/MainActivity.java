@@ -1,45 +1,24 @@
 package otk.test;
 
-import android.content.ClipData;
-import android.view.DragEvent;
-import android.view.MotionEvent;
-import android.view.Window;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 
-import android.Manifest;
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.Activity;
-import android.app.usage.UsageEvents;
-import android.content.Context;
 import android.content.Intent;
 import android.content.DialogInterface;
 import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.os.Vibrator;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -48,24 +27,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -74,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements
     private static final String DIALOG_ERROR = "dialog_error";
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
+
     private EventListAdapter adapter;
     //private ArrayAdapter<EventData> adapter;
 
@@ -83,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleMap mMap;
     private MapsActivity mapClass = new MapsActivity();
 
-    private int windowHeight;
-
     //private LocationManager locMang;
     private Boolean GPSEnabled, NWEnabled;
 
@@ -92,6 +54,9 @@ public class MainActivity extends AppCompatActivity implements
     private float LOCATION_REFRESH_DISTANCE = 50;
     private boolean Location_Services_On = false;
 
+    private RecyclerView recyclerView;
+    private RecyclerEventListAdapter recyclerViewAdapter;
+    private RecyclerView.LayoutManager recyclerViewLayoutManager;
 
     static final int CREATE_EVENT_REQUEST = 1;
 
@@ -106,64 +71,10 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("APP STARTED", "HELLO");
 
-        windowHeight = getWindow().findViewById(Window.ID_ANDROID_CONTENT).getHeight();
-
-        View splitter = findViewById(R.id.layout_draggable);
-        /*
-        splitter.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                }
-                else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-
-                }
-
-                return true;
-            }
-        });
-        */
-
-        /*splitter.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                    ClipData data = ClipData.newPlainText("", "");
-                    View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(v);
-                    v.startDrag(data, shadowBuilder, v, 0);
-                    v.setVisibility(View.INVISIBLE);
-                    Log.d("DRAG EVENT STARTED", "!!!!");
-                    return true;
-                }
-
-                return false;
-            }
-        });
-        splitter.setOnDragListener(new View.OnDragListener() {
-            @Override
-            public boolean onDrag(View v, DragEvent event) {
-                if (event.getAction() == DragEvent.ACTION_DRAG_LOCATION) {
-                    Log.d("ACTION_DRAG_LOCATION", Float.toString(event.getY()));
-                }
-                Log.d("DRAG EVENT", "!!!!");
-                return true;
-            }
-        });
-
-        Log.d("DRAG LISTENER SET", "---");*/
-
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);
         mapFragment.getMap().setOnMapClickListener(mapClass);
-
-        //Default is going to be null
-        //If the event is null then don't fill anything
-        //Once the event is adjusted by create event AND placed in the list, it will return to null to signify no waiting events
-        //EventData initEvent = new EventData("","","","/null",new MarkerOptions().position(new LatLng(0,0)).title(""), new Date());
-        //((MyApplication) getApplication()).setTempEvent(initEvent);
-        //eventListStorage.add(initEvent);
 
         UserData mainUser = new UserData("Stannis Baratheon");
         ((MyApplication) getApplication()).setUser(mainUser);
@@ -171,42 +82,50 @@ public class MainActivity extends AppCompatActivity implements
         mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
-                //eventParcelable parcelToSend= new eventParcelable(point.latitude, point.longitude, "Tim", "TempParcel","Just a temporary thing","Home");
                 ((MyApplication) getApplication()).setTempEvent(new EventData());
                 ((MyApplication) getApplication()).getTempEvent().setLocation(point);
                 mapFragment.getView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 
                 Intent createEventIntent = new Intent(MainActivity.this, CreateEvent.class);
-                //createEventIntent.putExtra("event", parcelToSend);
                 startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
             }
         });
 
-        //Create Event Button
-        Button createEvent = (Button) findViewById(R.id.createevent);
-        createEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CreateEvent.class);
-                startActivity(intent);
-            }
-        });
 
+        //adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
+        //ListView listView1 = (ListView) findViewById(R.id.eventListView);
 
-        adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
-        ListView listView1 = (ListView) findViewById(R.id.eventListView);
+        recyclerView = (RecyclerView) findViewById(R.id.eventRecyclerView);
 
-        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                EventData data = (EventData) parent.getItemAtPosition(position);
-                ((MyApplication) getApplication()).setTempEvent(data);
-                Intent intent = new Intent(MainActivity.this, Event_Details.class);
-                startActivity(intent);
-            }
-        });
+        recyclerViewLayoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-        listView1.setAdapter(adapter);
+        recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
+        recyclerView.setAdapter(recyclerViewAdapter);
+
+        recyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        EventData data = recyclerViewAdapter.getItemAtPosition(position);
+                        ((MyApplication) getApplication()).setTempEvent(data);
+                        Intent intent = new Intent(MainActivity.this, Event_Details.class);
+                        startActivity(intent);
+                    }
+                })
+        );
+
+//        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                EventData data = (EventData) parent.getItemAtPosition(position);
+//                ((MyApplication) getApplication()).setTempEvent(data);
+//                Intent intent = new Intent(MainActivity.this, Event_Details.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        listView1.setAdapter(adapter);
 
 
         //Build Google Client to communicate with google play services
@@ -242,20 +161,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
 
                 return super.onOptionsItemSelected(item);
-            }
-
-            public void initMap() {
-                MapFragment mapFrag = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
-                mapFrag.getMapAsync(new OnMapReadyCallback() {
-                    @Override
-                    public void onMapReady(GoogleMap googleMap) {
-                        mMap = googleMap;
-                        // Add a marker in Sydney and move the camera
-                        LatLng sydney = new LatLng(-34, 151);
-                        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-                        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
-                    }
-                });
             }
 
             @Override
@@ -367,7 +272,7 @@ public class MainActivity extends AppCompatActivity implements
                 mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
 
                 ((MyApplication) getApplication()).addToEventList(newEvent);
-                adapter.notifyDataSetChanged();
+                recyclerViewAdapter.notifyDataSetChanged();
                //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
             }
         }

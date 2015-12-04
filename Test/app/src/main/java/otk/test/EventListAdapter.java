@@ -26,11 +26,6 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         this.data = data;
     }
 
-//    @Override
-//    public EventData getItem(int position) {
-//        return data.get(position);
-//    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View row = convertView;
