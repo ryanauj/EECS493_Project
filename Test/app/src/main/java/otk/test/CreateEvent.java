@@ -4,11 +4,14 @@ import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.text.format.DateUtils;
-import android.text.format.Time;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.HapticFeedbackConstants;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -19,13 +22,20 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.w3c.dom.Text;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class CreateEvent extends AppCompatActivity {
 
@@ -43,10 +53,11 @@ public class CreateEvent extends AppCompatActivity {
         final TextView creatorView = (TextView) findViewById(R.id.creator);
         final EditText descriptionView = (EditText) findViewById(R.id.description);
         final EditText locationView = (EditText) findViewById(R.id.location);
+
         if(createEventData != null)
         {
             titleView.setText(createEventData.getTitle());
-            creatorView.setText(createEventData.getCreator());
+            creatorView.setText( ((MyApplication) getApplication()).getUser().getUserName());
             descriptionView.setText(createEventData.getDescription());
             locationView.setText(createEventData.getLocation().getPosition().toString());
         }
@@ -92,20 +103,20 @@ public class CreateEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Log.e("click", "submit clicked");
                 Log.e("title", titleView.getText().toString());
-                Log.e("creator", creatorView.getText().toString());
+                //Log.e("creator", creatorView.getText().toString());
                 Log.e("description", descriptionView.getText().toString());
                 Log.e("location", locationView.getText().toString());
 
                 Date returnDate = new Date(cal.getTime().getTime());
-                createEventData.setCreator(creatorView.getText().toString());
+                //createEventData.setCreator(creatorView.getText().toString());
+                createEventData.setCreator("Someone");
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
-                createEventData.setLocation(tempLoc);
                 ((MyApplication) getApplication()).setTempEvent(createEventData);
 
                 Intent intent = new Intent();
-                setResult(RESULT_OK,intent);
+                setResult(RESULT_OK, intent);
                 finish();
                 //Log.e("time", timeView.getHour()+" "+timeView.getMinute()+timeView.getBaseline());
                 //Log.e("date", dateView.getMonth() + " " + dateView.getDayOfMonth() + " " + dateView.getYear());
@@ -129,6 +140,26 @@ public class CreateEvent extends AppCompatActivity {
                 mainpage.requestFocus();
                 hideSoftKeyboard(CreateEvent.this);
                 setDate();
+            }
+        });
+
+
+        final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapLocEditor);
+        mapFragment.getMap().addMarker(new MarkerOptions().position(createEventData.getLocation().getPosition()).title("Event Location"));
+        mapFragment.getMap().moveCamera(CameraUpdateFactory.newLatLng(createEventData.getLocation().getPosition()));
+        mapFragment.getMap().animateCamera(CameraUpdateFactory.zoomTo(15));
+
+        mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng point) {
+                //eventParcelable parcelToSend= new eventParcelable(point.latitude, point.longitude, "Tim", "TempParcel","Just a temporary thing","Home");
+                ((MyApplication) getApplication()).getTempEvent().setLocation(point);
+                mapFragment.getView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
+                mapFragment.getMap().clear();
+                mapFragment.getMap().addMarker(new MarkerOptions().position(point).title("Event Location"));
+                createEventData.setLocation(point);
+                final EditText locationView = (EditText) findViewById(R.id.location);
+                locationView.setText(point.toString());
             }
         });
 
@@ -189,4 +220,5 @@ public class CreateEvent extends AppCompatActivity {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
     }
+
 }

@@ -79,8 +79,9 @@
         android:hint="Location"/>
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_height="200dp"
+            android:orientation="horizontal"
+            android:layout_gravity="center">
             <fragment
                 android:id="@+id/mapLocEditor"
                 android:layout_width="match_parent"

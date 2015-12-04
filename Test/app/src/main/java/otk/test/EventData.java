@@ -13,7 +13,15 @@ public class EventData {
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
 
-    EventData(){}
+    EventData(){
+        this.creator = "";
+        this.title = "";
+        this.description = "";
+        this.pictureUrl = "";
+        this.location = new MarkerOptions();
+        this.location.position(new LatLng(0,0));
+        this.time = new Date();
+    }
 
     EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location, Date time) {
         this.creator = creator;
@@ -98,6 +106,11 @@ public class EventData {
                 + "\nlocation:" + this.location.toString()
                 + "\ndatetime:" + this.time.toString()
                 + "\nimagepath" + this.pictureUrl;
+    }
+
+    @Override
+    public String toString() {
+        return title;
     }
 
 }
