@@ -87,6 +87,7 @@ public class MainActivity extends AppCompatActivity implements
 
     private long LOCATION_REFRESH_TIME = 10000;
     private float LOCATION_REFRESH_DISTANCE = 50;
+    private boolean Location_Services_On = false;
 
 
     static final int CREATE_EVENT_REQUEST = 1;
@@ -121,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
         });
         */
 
-        splitter.setOnTouchListener(new View.OnTouchListener() {
+        /*splitter.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -147,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        Log.d("DRAG LISTENER SET", "---");
+        Log.d("DRAG LISTENER SET", "---");*/
 
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
@@ -160,6 +161,9 @@ public class MainActivity extends AppCompatActivity implements
         EventData initEvent = new EventData("","","","/null",new MarkerOptions().position(new LatLng(0,0)).title(""), new Date());
         ((MyApplication) getApplication()).setTempEvent(initEvent);
         //eventListStorage.add(initEvent);
+
+        UserData mainUser = new UserData("Stannis Baratheon");
+        ((MyApplication) getApplication()).setUser(mainUser);
 
         mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -180,16 +184,6 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, CreateEvent.class);
-                startActivity(intent);
-            }
-        });
-
-        //testconnection Button
-        Button testconnection = (Button) findViewById(R.id.testconnection);
-        testconnection.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, testconnection.class);
                 startActivity(intent);
             }
         });
@@ -269,7 +263,7 @@ public class MainActivity extends AppCompatActivity implements
                         mMap = googleMap;
                         // Add a marker in Sydney and move the camera
                         LatLng sydney = new LatLng(-34, 151);
-                        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+                        //mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
                         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
                     }
                 });
@@ -383,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements
                 final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                 mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
 
-                eventListStorage.add(newEvent);
+                ((MyApplication) getApplication()).addToEventList(newEvent);
                 adapter.notifyDataSetChanged();
                //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
             }
@@ -405,14 +399,14 @@ public class MainActivity extends AppCompatActivity implements
                     mapClass.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
                     mapClass.LocProvider = "GPS_PROVIDER";
                     Toast.makeText(getApplicationContext(), "GPS Services are being used", Toast.LENGTH_LONG).show();
-
+                    Location_Services_On=true;
                 }
                 else if(NWEnabled)
                 {
                     mapClass.mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
                     mapClass.LocProvider = "NETWORK_PROVIDER";
                     Toast.makeText(getApplicationContext(), "Network Services are being used", Toast.LENGTH_LONG).show();
-
+                    Location_Services_On=true;
                 }
                 if(mapClass.mLocationManager != null)
                 {
@@ -426,6 +420,21 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        mapClass.mLocationManager.removeUpdates(this);
+        Location_Services_On = false;
+
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        setLocationServices();
+    }
 
 }
 

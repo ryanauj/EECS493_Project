@@ -2,11 +2,13 @@ package otk.test;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -40,21 +42,21 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
-
-            holder = new eventHolder();
-            holder.txtCreator = (TextView)row.findViewById(R.id.eventCreator);
-            holder.txtDescription = (TextView)row.findViewById(R.id.eventTitle);
-
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (eventHolder)row.getTag();
         }
 
         EventData nextEvent = data.get(position);
-        holder.txtCreator.setText(nextEvent.getCreator());
-        holder.txtDescription.setText(nextEvent.getDescription());
+
+        if(nextEvent!=null) {
+            TextView tt1 = (TextView) row.findViewById(R.id.eventCreator);
+            TextView tt2 = (TextView) row.findViewById(R.id.eventTitle);
+
+            if(tt1 != null)
+                tt1.setText(nextEvent.getCreator());
+            else
+                Log.e("Adapter", "Text Field Returned null");
+            if(tt2 != null)
+                tt2.setText(nextEvent.getTitle());
+        }
         return row;
     }
 
