@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements
     //private LocationManager locMang;
     private Boolean GPSEnabled, NWEnabled;
 
-    private long LOCATION_REFRESH_TIME = 10000;
+    private long LOCATION_REFRESH_TIME = 100000;
     private float LOCATION_REFRESH_DISTANCE = 50;
     private boolean Location_Services_On = false;
 
@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements
                 startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
             }
         });
-
 
         //adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
         //ListView listView1 = (ListView) findViewById(R.id.eventListView);

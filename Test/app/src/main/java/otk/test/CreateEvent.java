@@ -52,14 +52,15 @@ public class CreateEvent extends AppCompatActivity {
         final EditText titleView = (EditText) findViewById(R.id.title);
         final TextView creatorView = (TextView) findViewById(R.id.creator);
         final EditText descriptionView = (EditText) findViewById(R.id.description);
-        final EditText locationView = (EditText) findViewById(R.id.location);
+
+        //final EditText locationView = (EditText) findViewById(R.id.location);
 
         if(createEventData != null)
         {
             titleView.setText(createEventData.getTitle());
             creatorView.setText( ((MyApplication) getApplication()).getUser().getUserName());
             descriptionView.setText(createEventData.getDescription());
-            locationView.setText(createEventData.getLocation().getPosition().toString());
+            //locationView.setText(createEventData.getLocation().getPosition().toString());
         }
 
         TextView timeView = (TextView) findViewById(R.id.time);
@@ -105,7 +106,7 @@ public class CreateEvent extends AppCompatActivity {
                 Log.e("title", titleView.getText().toString());
                 //Log.e("creator", creatorView.getText().toString());
                 Log.e("description", descriptionView.getText().toString());
-                Log.e("location", locationView.getText().toString());
+                //Log.e("location", locationView.getText().toString());
 
                 Date returnDate = new Date(cal.getTime().getTime());
                 //createEventData.setCreator(creatorView.getText().toString());
@@ -158,8 +159,8 @@ public class CreateEvent extends AppCompatActivity {
                 mapFragment.getMap().clear();
                 mapFragment.getMap().addMarker(new MarkerOptions().position(point).title("Event Location"));
                 createEventData.setLocation(point);
-                final EditText locationView = (EditText) findViewById(R.id.location);
-                locationView.setText(point.toString());
+                //final EditText locationView = (EditText) findViewById(R.id.location);
+                //locationView.setText(point.toString());
             }
         });
 

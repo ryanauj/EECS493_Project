@@ -39,6 +39,10 @@ public class MyApplication extends Application {
         eventStorage.add(add);
     }
 
+    public void clearEventStorage() {
+        this.eventStorage = new LinkedList<>();
+    }
+
     public List<EventData> getEventStorage() { return eventStorage; }
 
     public void logEventList() {
