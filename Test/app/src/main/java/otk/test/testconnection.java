@@ -50,6 +50,6 @@ public class testconnection extends AppCompatActivity {
         event.setTime(new Date());
         event.setNameOfLocation("Andrew's House");
 
-        new UploadEventData(event).execute("http://findme-env.elasticbeanstalk.com/addevent.php");
+        // new UploadEventData(event).execute("http://findme-env.elasticbeanstalk.com/addevent.php");
     }
 }

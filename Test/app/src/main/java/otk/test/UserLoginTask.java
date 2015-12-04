@@ -1,5 +1,7 @@
 package otk.test;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -19,11 +21,14 @@ import java.net.URL;
  */
 public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
     // http://findme-env.elasticbeanstalk.com/userlogin.php
-    
+
+    Context context;
+    UserData user;
     String username = "";
     String password = "";
 
-    public UserLoginTask(String username, String password) {
+    public UserLoginTask(Context context, String username, String password) {
+        this.context = context;
         this.username = username;
         this.password = password;
     }
@@ -65,12 +70,15 @@ public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
             return false;
         }
 
+        user.setUserName(username);
+
         return true;
     }
 
     protected void onPostExecute(Boolean success) {
         if (success) {
-            Log.e("UserLogin","Success");
+            Log.e("UserLogin", "Success");
+            ((MyApplication) context.getApplicationContext()).setUser(user);
         }
         else {
             Log.e("UserLogin","Failure");

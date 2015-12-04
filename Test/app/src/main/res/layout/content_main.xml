@@ -23,11 +23,6 @@
             android:layout_height="match_parent"
             android:name="com.google.android.gms.maps.MapFragment"
         />
-        <Button
-            android:id="@+id/createevent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Create Event"/>
     </LinearLayout>
     <View android:id="@+id/layout_draggable"
         android:layout_height="10dp"

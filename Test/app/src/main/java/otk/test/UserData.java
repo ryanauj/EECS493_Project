@@ -11,6 +11,10 @@ public class UserData {
         this.userName = name;
     }
 
+    UserData(UserData user) {
+        this.userName = user.getUserName();
+    }
+
     public void setUserName(String name)
     {
         userName = name;
