@@ -19,8 +19,6 @@ import android.widget.TimePicker;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import org.w3c.dom.Text;
-
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -34,23 +32,17 @@ public class CreateEvent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
 
-
-        tempLoc = ((MyApplication) this.getApplication()).getTempEvent().getLocation().getPosition();
-
-        final EventData createEventData = new EventData();
-        createEventData.setLocation(tempLoc);
+        final EventData createEventData = ((MyApplication) this.getApplication()).getTempEvent();
+        tempLoc = createEventData.getLocation().getPosition();
 
         final EditText titleView = (EditText) findViewById(R.id.title);
-        final TextView creatorView = (TextView) findViewById(R.id.creator);
+        titleView.setText(createEventData.getTitle());
+        //final EditText creatorView = (EditText) findViewById(R.id.creator);
+        //creatorView.setText(createEventData.getCreator());
         final EditText descriptionView = (EditText) findViewById(R.id.description);
+        descriptionView.setText(createEventData.getDescription());
         final EditText locationView = (EditText) findViewById(R.id.location);
-        if(createEventData != null)
-        {
-            titleView.setText(createEventData.getTitle());
-            creatorView.setText(createEventData.getCreator());
-            descriptionView.setText(createEventData.getDescription());
-            locationView.setText(createEventData.getLocation().getPosition().toString());
-        }
+        locationView.setText(createEventData.getLocation().getPosition().toString());
 
         TextView timeView = (TextView) findViewById(R.id.time);
         timeView.setText(getTimeString(cal));
@@ -93,16 +85,17 @@ public class CreateEvent extends AppCompatActivity {
             public void onClick(View v) {
                 Log.e("click", "submit clicked");
                 Log.e("title", titleView.getText().toString());
-                Log.e("creator", creatorView.getText().toString());
+                //Log.e("creator", creatorView.getText().toString());
                 Log.e("description", descriptionView.getText().toString());
                 Log.e("location", locationView.getText().toString());
 
                 Date returnDate = new Date(cal.getTime().getTime());
-                createEventData.setCreator(creatorView.getText().toString());
+                //createEventData.setCreator(creatorView.getText().toString());
+                createEventData.setCreator("Someone");
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
-                //createEventData.setLocation(tempLoc);
+                createEventData.setLocation(tempLoc);
                 ((MyApplication) getApplication()).setTempEvent(createEventData);
 
                 Intent intent = new Intent();

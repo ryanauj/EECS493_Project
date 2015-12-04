@@ -107,4 +107,9 @@ public class EventData {
                 + "\nimagepath" + this.pictureUrl;
     }
 
+    @Override
+    public String toString() {
+        return title;
+    }
+
 }

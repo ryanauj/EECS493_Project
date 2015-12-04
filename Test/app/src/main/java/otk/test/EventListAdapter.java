@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -17,7 +18,6 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
     Context context;
     int layoutResourceId;
     List<EventData> data=null;
-    public static final String EVENT_DATA_STRING = "EVENT_DATA_STRING";
 
     public EventListAdapter(Context context, int layoutResourceId, List<EventData> data) {
         super(context, layoutResourceId, data);
@@ -26,10 +26,10 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         this.data = data;
     }
 
-    @Override
-    public EventData getItem(int position) {
-        return data.get(position);
-    }
+//    @Override
+//    public EventData getItem(int position) {
+//        return data.get(position);
+//    }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -39,11 +39,14 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         if(row == null)
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            row = inflater.inflate(layoutResourceId, parent, false);
+            //row = inflater.inflate(layoutResourceId, parent, false);
+
+            row = inflater.inflate(R.layout.event_list_card, parent, false);
 
             holder = new eventHolder();
-            holder.txtCreator = (TextView)row.findViewById(R.id.eventCreator);
-            holder.txtDescription = (TextView)row.findViewById(R.id.eventTitle);
+            //holder.layout = (LinearLayout) row.findViewById(R.id.eventCard);
+            holder.txtCreator = (TextView) row.findViewById(R.id.eventCreator);
+            holder.txtDescription = (TextView) row.findViewById(R.id.eventTitle);
 
             row.setTag(holder);
         }
@@ -56,10 +59,13 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         holder.txtCreator.setText(nextEvent.getCreator());
         holder.txtDescription.setText(nextEvent.getDescription());
         return row;
+//        return convertView;
     }
 
     static class eventHolder
     {
+        LinearLayout layout;
         TextView txtCreator,txtDescription;
+        //TextView text1;
     }
 }

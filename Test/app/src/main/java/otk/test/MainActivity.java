@@ -35,6 +35,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity implements
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
     private EventListAdapter adapter;
+    //private ArrayAdapter<EventData> adapter;
+
     //private List<EventData> eventListStorage = new LinkedList<EventData>();
 
     //All Google Map Variables
@@ -157,14 +160,15 @@ public class MainActivity extends AppCompatActivity implements
         //Default is going to be null
         //If the event is null then don't fill anything
         //Once the event is adjusted by create event AND placed in the list, it will return to null to signify no waiting events
-        EventData initEvent = new EventData("","","","/null",new MarkerOptions().position(new LatLng(0,0)).title(""), new Date());
-        ((MyApplication) getApplication()).setTempEvent(initEvent);
+        //EventData initEvent = new EventData("","","","/null",new MarkerOptions().position(new LatLng(0,0)).title(""), new Date());
+        //((MyApplication) getApplication()).setTempEvent(initEvent);
         //eventListStorage.add(initEvent);
 
         mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
                 //eventParcelable parcelToSend= new eventParcelable(point.latitude, point.longitude, "Tim", "TempParcel","Just a temporary thing","Home");
+                ((MyApplication) getApplication()).setTempEvent(new EventData());
                 ((MyApplication) getApplication()).getTempEvent().setLocation(point);
                 mapFragment.getView().performHapticFeedback(HapticFeedbackConstants.LONG_PRESS);
 
@@ -194,9 +198,9 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
+        adapter = new EventListAdapter(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
+ //       adapter = new ArrayAdapter<EventData>(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
         ListView listView1 = (ListView) findViewById(R.id.eventListView);
-        listView1.setAdapter(adapter);
 
         listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -207,6 +211,8 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(intent);
             }
         });
+
+        listView1.setAdapter(adapter);
 
 
         //Build Google Client to communicate with google play services
