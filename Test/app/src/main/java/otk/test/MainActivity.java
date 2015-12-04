@@ -183,11 +183,11 @@ public class MainActivity extends AppCompatActivity implements
         });
 
         //Create Event Button
-        Button createEvent = (Button) findViewById(R.id.createevent);
-        createEvent.setOnClickListener(new View.OnClickListener() {
+        Button login = (Button) findViewById(R.id.login);
+        login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, CreateEvent.class);
+                Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
             }
         });
