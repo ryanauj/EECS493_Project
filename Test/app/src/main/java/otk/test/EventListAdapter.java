@@ -2,11 +2,11 @@ package otk.test;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -39,33 +39,27 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         if(row == null)
         {
             LayoutInflater inflater = ((Activity)context).getLayoutInflater();
-            //row = inflater.inflate(layoutResourceId, parent, false);
-
-            row = inflater.inflate(R.layout.event_list_card, parent, false);
-
-            holder = new eventHolder();
-            //holder.layout = (LinearLayout) row.findViewById(R.id.eventCard);
-            holder.txtCreator = (TextView) row.findViewById(R.id.eventCreator);
-            holder.txtDescription = (TextView) row.findViewById(R.id.eventTitle);
-
-            row.setTag(holder);
-        }
-        else
-        {
-            holder = (eventHolder)row.getTag();
+            row = inflater.inflate(layoutResourceId, parent, false);
         }
 
         EventData nextEvent = data.get(position);
-        holder.txtCreator.setText(nextEvent.getCreator());
-        holder.txtDescription.setText(nextEvent.getDescription());
+
+        if(nextEvent!=null) {
+            TextView tt1 = (TextView) row.findViewById(R.id.eventCreator);
+            TextView tt2 = (TextView) row.findViewById(R.id.eventTitle);
+
+            if(tt1 != null)
+                tt1.setText(nextEvent.getCreator());
+            else
+                Log.e("Adapter", "Text Field Returned null");
+            if(tt2 != null)
+                tt2.setText(nextEvent.getTitle());
+        }
         return row;
-//        return convertView;
     }
 
     static class eventHolder
     {
-        LinearLayout layout;
         TextView txtCreator,txtDescription;
-        //TextView text1;
     }
 }
