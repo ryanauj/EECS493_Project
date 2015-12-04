@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="otk.test.Event_Details"
-    android:fillViewport="false">
+    android:layout_height="match_parent" tools:context="otk.test.Event_Details">
 
     <!-- Data structure:
         Creator
@@ -22,12 +21,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+        <!--
+                <ImageView
+                    android:id="@+id/event_picture"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"
+                    android:background="#AAAAAA"/>-->
 
-        <ImageView
-            android:id="@+id/event_picture"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            android:background="#AAAAAA"/>
+            android:orientation="horizontal"
+            android:layout_gravity="center">
+            <fragment
+                android:id="@+id/locStreetView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:name="com.google.android.gms.maps.StreetViewPanoramaFragment"
+                />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/event_title"
