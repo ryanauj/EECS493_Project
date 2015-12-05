@@ -20,23 +20,28 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="22dp"
+            android:textSize="40dp"
             android:gravity="center"
-            android:text="Create Event"/>
+            android:text="Create Event"
+            android:textColor="@color/appColor"/>
+
         <TextView
-        android:id="@+id/creator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textCapWords"
-        android:hint="Creator"/>
+            android:id="@+id/creator"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:inputType="textCapWords"
+            android:hint="Creator"
+            android:gravity="center"/>
 
         <EditText
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:inputType="text|textCapSentences"
-            android:hint="Title"/>
+            android:hint="Title"
+            android:textColor="@color/black"/>
         <EditText
             android:id="@+id/description"
             android:layout_width="match_parent"
@@ -44,7 +49,8 @@
             android:layout_marginTop="10dp"
             android:inputType="textLongMessage"
             android:hint="Describe your event..."
-            android:maxLines="10"/>
+            android:maxLines="10"
+            android:textColor="@color/black"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -104,7 +110,7 @@
             android:id="@+id/createevent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_gravity="center"
             android:text="Create Event"/>
     </LinearLayout>

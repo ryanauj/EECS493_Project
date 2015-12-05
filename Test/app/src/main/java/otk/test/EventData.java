@@ -12,6 +12,7 @@ public class EventData {
     private MarkerOptions location = new MarkerOptions();
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
+    private int max_attend,total_rsvp;
 
     EventData() {
         this.creator = "";

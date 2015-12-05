@@ -42,12 +42,18 @@ public class EventListAdapter extends ArrayAdapter<EventData> {
         if(nextEvent!=null) {
             TextView tt1 = (TextView) row.findViewById(R.id.eventCreator);
             TextView tt2 = (TextView) row.findViewById(R.id.eventTitle);
+            TextView tt3 = (TextView) row.findViewById(R.id.Time_slot);
+            TextView tt4 = (TextView) row.findViewById(R.id.Date_slot);
 
             if(tt1 != null)
                 tt1.setText(nextEvent.getCreator());
             else
                 Log.e("Adapter", "Text Field Returned null");
             if(tt2 != null)
+                tt2.setText(nextEvent.getTitle());
+            if(tt3 != null)
+                tt2.setText(nextEvent.getTime().toString());
+            if(tt4 != null)
                 tt2.setText(nextEvent.getTitle());
         }
         return row;

@@ -110,7 +110,7 @@ public class CreateEvent extends AppCompatActivity {
 
                 Date returnDate = new Date(cal.getTime().getTime());
                 //createEventData.setCreator(creatorView.getText().toString());
-                createEventData.setCreator("Someone");
+                createEventData.setCreator((((MyApplication) getApplication()).getUser().getUserName()));
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
