@@ -13,7 +13,7 @@ public class EventData {
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
 
-    EventData(){
+    EventData() {
         this.creator = "";
         this.title = "";
         this.description = "";
