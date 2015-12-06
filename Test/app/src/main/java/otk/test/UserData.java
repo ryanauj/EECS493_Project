@@ -6,6 +6,7 @@ package otk.test;
 public class UserData {
 
     private String userName;
+    private String color;
 
     UserData(String name) {
         this.userName = name;
@@ -13,14 +14,21 @@ public class UserData {
 
     UserData(UserData user) {
         this.userName = user.getUserName();
+        this.color = user.getColor();
     }
 
     public void setUserName(String name)
     {
-        userName = name;
+        this.userName = name;
     }
     public String getUserName()
     {
         return userName;
+    }
+    public void setColor(String color) {
+        this.color = color;
+    }
+    public String getColor() {
+        return this.color;
     }
 }
