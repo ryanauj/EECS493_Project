@@ -93,8 +93,13 @@ public class MainActivity extends AppCompatActivity implements
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (username != null) {
+            if (username != null && !username.equals("Not Logged In")) {
                 ((MyApplication) getApplication()).setUser(new UserData(username));
+            }
+            else {
+                // re-route to login
+                Intent intent = new Intent(MainActivity.this,Login.class);
+                startActivity(intent);
             }
         }
         else {
@@ -102,6 +107,10 @@ public class MainActivity extends AppCompatActivity implements
             try {
                 FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                 fos.close();
+
+                // re-route to login
+                Intent intent = new Intent(MainActivity.this,Login.class);
+                startActivity(intent);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
