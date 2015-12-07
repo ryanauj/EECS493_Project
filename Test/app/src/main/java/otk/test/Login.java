@@ -16,7 +16,10 @@ import android.widget.TextView;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -34,17 +37,51 @@ public class Login extends AppCompatActivity {
         String currentusername = ((MyApplication) getApplication()).getUser().getUserName();
         currentuser.setText(currentusername);
 
-        Button login = (Button) findViewById(R.id.login);
+        Button login = (Button) findViewById(R.id.loginbutton);
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 EditText username = (EditText) findViewById(R.id.username);
                 EditText password = (EditText) findViewById(R.id.password);
 
-                new UserLoginTask(username.getText().toString(),password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
+                new UserLoginTask(username.getText().toString(), password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
 
                 //UserLoginTask login = new UserLoginTask(getApplicationContext(),username.getText().toString(),password.getText().toString());
                 //login.execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
+            }
+        });
+
+        Button logout = (Button) findViewById(R.id.logoutbutton);
+        if (((MyApplication) getApplication()).getUser().getUserName().equals("Not Logged In")) {
+            logout.setVisibility(View.GONE);
+        }
+        logout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In"));
+                String FILENAME = "userdata";
+
+                try {
+                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    fos.write("Not Logged In".getBytes());
+                    fos.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(Login.this, MainActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        Button createuser = (Button) findViewById(R.id.createuser);
+        createuser.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Login.this, CreateUser.class);
+                startActivity(intent);
             }
         });
     }
@@ -62,6 +99,7 @@ public class Login extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... url) {
+            String result;
             try {
                 URL urlname = new URL(url[0]);
                 HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
@@ -69,7 +107,7 @@ public class Login extends AppCompatActivity {
                 conn.setInstanceFollowRedirects(false);
                 conn.setRequestMethod("POST");
                 //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-                //conn.setRequestProperty("charset", "utf-8");
+                conn.setRequestProperty("charset", "utf-8");
                 //conn.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
                 //conn.setUseCaches(false);
                 conn.setChunkedStreamingMode(0);
@@ -84,34 +122,49 @@ public class Login extends AppCompatActivity {
                 wr.flush();
                 wr.close();
 
+                result = conn.getResponseCode()+"";
                 conn.disconnect();
 
             } catch (MalformedURLException e) {
                 Log.e("MalformedURL", e.getMessage());
-                return null;
+                return e.getMessage();
             } catch (IOException e) {
                 Log.e("IOException", e.getMessage());
-                return null;
+                return e.getMessage();
             } catch (JSONException e) {
                 Log.e("JSONException", e.getMessage());
-                return null;
+                return e.getMessage();
             }
 
-            return username;
+            return result;
         }
 
-        protected void onPostExecute(String username) {
-            if (username == null) {
-                // failed to login, call AlertDialog from below
+        protected void onPostExecute(String result) {
+            if(result.equals("200")) {
+                // successful login
+                ((MyApplication) getApplication()).setUser(new UserData(username));
+                String FILENAME = "userdata";
+
+                try {
+                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    fos.write(username.getBytes());
+                    fos.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(Login.this, MainActivity.class);
+                startActivity(intent);
+            }
+            else if(result.equals("400")) {
+                // incorrect login
                 alert("Incorrect username or password. Please try again.");
             }
             else {
-                // login successful, set global user
-                ((MyApplication) getApplication()).setUser(new UserData(username));
-                
-                // redirect to MainActivity
-                //Intent intent = new Intent(Login.this, MainActivity.class);
-                //startActivity(intent);
+                // unknown error
+                alert("ERROR: "+result);
             }
         }
     }

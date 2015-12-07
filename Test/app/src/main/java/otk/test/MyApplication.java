@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class MyApplication extends Application {
     private List<EventData> eventStorage = new LinkedList<>();
-    private UserData currUser;
+    private UserData currUser = new UserData("Not Logged In");
     private EventData tempEvent;
 
     public void setTempEvent(EventData event)
@@ -26,12 +26,12 @@ public class MyApplication extends Application {
 
     public void setUser(UserData user)
     {
-        currUser = user;
+        this.currUser = user;
     }
 
     public UserData getUser()
     {
-        return currUser;
+        return this.currUser;
     }
 
     public void addToEventList(EventData add)
