@@ -118,16 +118,6 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
-        // test button
-        Button testbutton = (Button) findViewById(R.id.testlogin);
-        testbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-            }
-        });
-
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);

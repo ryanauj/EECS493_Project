@@ -24,11 +24,6 @@
             android:name="com.google.android.gms.maps.MapFragment"
         />
     </LinearLayout>
-    <Button
-        android:id="@+id/testlogin"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="test"/>
     <View android:id="@+id/layout_draggable"
         android:layout_height="10dp"
         android:layout_width="fill_parent"

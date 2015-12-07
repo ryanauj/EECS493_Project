@@ -55,26 +55,28 @@ public class Login extends AppCompatActivity {
         if (((MyApplication) getApplication()).getUser().getUserName().equals("Not Logged In")) {
             logout.setVisibility(View.GONE);
         }
-        logout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In"));
-                String FILENAME = "userdata";
+        else {
+            logout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In"));
+                    String FILENAME = "userdata";
 
-                try {
-                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-                    fos.write("Not Logged In".getBytes());
-                    fos.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                        fos.write("Not Logged In".getBytes());
+                        fos.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent intent = new Intent(Login.this, MainActivity.class);
+                    startActivity(intent);
                 }
-
-                Intent intent = new Intent(Login.this, MainActivity.class);
-                startActivity(intent);
-            }
-        });
+            });
+        }
 
         Button createuser = (Button) findViewById(R.id.createuser);
         createuser.setOnClickListener(new View.OnClickListener() {
