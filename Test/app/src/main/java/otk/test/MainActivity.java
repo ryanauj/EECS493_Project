@@ -1,5 +1,6 @@
 package otk.test;
 
+import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -29,6 +31,12 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.common.ConnectionResult;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -66,18 +74,57 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
-        UserData initUser = new UserData("Tim");
-        ((MyApplication) getApplication()).setUser(initUser);
+        //UserData initUser = new UserData("Tim");
+        //((MyApplication) getApplication()).setUser(initUser);
 
         Log.d("APP STARTED", "HELLO");
+
+        // check for logged in user through
+        if (fileExists(this,"userdata")) {
+            String username = null;
+            try {
+                FileInputStream fis = openFileInput("userdata");
+                byte[] input = new byte[fis.available()];
+                while (fis.read(input) != -1) {}
+                username = new String(input);
+                fis.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (username != null && !username.equals("Not Logged In")) {
+                ((MyApplication) getApplication()).setUser(new UserData(username));
+            }
+            else {
+                // re-route to login
+                Intent intent = new Intent(MainActivity.this,Login.class);
+                startActivity(intent);
+            }
+        }
+        else {
+            // create userdata file
+            try {
+                FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                fos.close();
+
+                // re-route to login
+                Intent intent = new Intent(MainActivity.this,Login.class);
+                startActivity(intent);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
         mapFragment.getMapAsync(mapClass);
         mapFragment.getMap().setOnMapClickListener(mapClass);
 
-        UserData mainUser = new UserData("Stannis Baratheon");
-        ((MyApplication) getApplication()).setUser(mainUser);
+        //UserData mainUser = new UserData("Stannis Baratheon");
+        //((MyApplication) getApplication()).setUser(mainUser);
 
         mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -327,6 +374,14 @@ public class MainActivity extends AppCompatActivity implements
     {
         super.onResume();
         setLocationServices();
+    }
+
+    public boolean fileExists(Context context, String filename) {
+        File file = context.getFileStreamPath(filename);
+        if(file == null || !file.exists()) {
+            return false;
+        }
+        return true;
     }
 
 }
