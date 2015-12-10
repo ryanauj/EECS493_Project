@@ -13,14 +13,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -60,12 +64,14 @@ public class Login extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",0));
-                    String FILENAME = "userdata";
 
                     try {
-                        FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                        FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                         fos.write("Not Logged In".getBytes());
                         fos.close();
+                        FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                        fos2.write("0".getBytes());
+                        fos2.close();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
                     } catch (IOException e) {
@@ -93,6 +99,7 @@ public class Login extends AppCompatActivity {
 
         String username = "";
         String password = "";
+        int color_value = 0;
 
         public UserLoginTask(String username, String password) {
             this.username = username;
@@ -124,6 +131,33 @@ public class Login extends AppCompatActivity {
                 wr.flush();
                 wr.close();
 
+                String json = "";
+                InputStreamReader inputStream = new InputStreamReader(conn.getInputStream(),"utf-8");
+                try {
+                    BufferedReader bufferedReader = new BufferedReader(inputStream, 8);
+                    StringBuilder stringBuilder = new StringBuilder();
+                    String line = null;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        stringBuilder.append(line + "\n");
+                    }
+                    inputStream.close();
+                    json = stringBuilder.toString();
+                } catch (UnsupportedEncodingException e) {
+                    Log.e("UnsupportedEncoding", e.getMessage());
+                } catch (IOException e) {
+                    Log.e("IOException", e.getMessage());
+                }
+
+                JSONObject jsonObject = new JSONObject();
+                // create jsonArray from string
+                try {
+                    jsonObject = new JSONObject(json);
+                } catch (JSONException e) {
+                    Log.e("JSONException", e.getMessage());
+                }
+
+                color_value = jsonObject.getInt("color");
+
                 result = conn.getResponseCode()+"";
                 conn.disconnect();
 
@@ -144,13 +178,15 @@ public class Login extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if(result.equals("200")) {
                 // successful login
-                ((MyApplication) getApplication()).setUser(new UserData(username,0));
-                String FILENAME = "userdata";
+                ((MyApplication) getApplication()).setUser(new UserData(username,color_value));
 
                 try {
-                    FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                     fos.write(username.getBytes());
                     fos.close();
+                    FileOutputStream fos2 = openFileOutput("usercolor", Context.MODE_PRIVATE);
+                    fos2.write((color_value+"").getBytes());
+                    fos2.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

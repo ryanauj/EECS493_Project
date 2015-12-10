@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,7 +65,9 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         EventData posData = this.data.get(position);
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
+
         holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
+
         //holder.borderColor.setColorFilter(userColor);
     }
 
