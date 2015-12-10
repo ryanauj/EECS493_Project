@@ -4,7 +4,7 @@
     android:layout_height="78dp"
     android:padding="2dp"
     android:orientation="vertical"
-    android:id="@+id/list_card"
+    android:id="@+id/bordercolor"
     android:background="#2489b0">
         <LinearLayout
             android:layout_width="match_parent"

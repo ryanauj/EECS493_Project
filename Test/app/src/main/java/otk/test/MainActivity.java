@@ -499,12 +499,19 @@ public class MainActivity extends AppCompatActivity implements
                     MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
                     Date time = new Date();
 
-                    ((MyApplication) getApplicationContext()).addToEventList(new EventData(creator, title, description, location, time, Integer.valueOf(color)));
+
+                    EventData newEvent = new EventData(creator, title, description, location, time, Integer.valueOf(color));
+
+                    final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
+                    mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
+
+                    ((MyApplication) getApplicationContext()).addToEventList(newEvent);
 
                 }
                 // done loading all events
-                recyclerViewAdapter.notifyDataSetChanged();
+                recyclerViewAdapter.setList(((MyApplication) getApplicationContext()).getEventStorage());
                 recyclerView.setAdapter(recyclerViewAdapter);
+                recyclerViewAdapter.notifyDataSetChanged();
             } catch (JSONException e) {
                 Log.e("JSONException", e.getMessage());
             }
