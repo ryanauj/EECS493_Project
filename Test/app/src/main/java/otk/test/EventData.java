@@ -14,7 +14,7 @@ public class EventData {
     private MarkerOptions location = new MarkerOptions();
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
-    private int max_attend;
+    private int max_attend, color;
     private HashSet attendees;
     private LinkedList<ForumPost> forum_list;
 
@@ -29,6 +29,7 @@ public class EventData {
         this.max_attend = 0;
         this.attendees = new HashSet();
         this.forum_list = new LinkedList<>();
+        this.color = 0xffffffff;//Hex for black
     }
 
     EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location,
@@ -116,6 +117,14 @@ public class EventData {
 
     public String getNameOfLocation() {
         return nameOfLocation;
+    }
+
+    public void setColor(int color) {
+        this.color=color;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     public String getPictureUrl() {

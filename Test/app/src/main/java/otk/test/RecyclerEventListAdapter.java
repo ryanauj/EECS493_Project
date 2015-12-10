@@ -1,10 +1,12 @@
 package otk.test;
 
 import android.content.Context;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -16,6 +18,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
     Context context;
     int layoutResourceId;
     List<EventData> data=null;
+    int userColor;
+
     private OnItemClickListener itemClickListener;
     private OnItemLongClickListener itemLongClickListener;
 
@@ -27,6 +31,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         void onItemLongClick(View view, int position);
     }
 
+
+
 // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -35,6 +41,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         public TextView txtCreator,txtDescription;
         public OnItemClickListener clickListener;
         public OnItemLongClickListener longClickListener;
+        public LinearLayout borderColor;
+
         public ViewHolder(View v, OnItemClickListener itemClickListener, OnItemLongClickListener itemLongClickListener) {
             super(v);
             this.clickListener = itemClickListener;
@@ -52,18 +60,20 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
 
         @Override
         public boolean onLongClick(View v) {
-            longClickListener.onItemLongClick(v, this.getAdapterPosition());
+            this.longClickListener.onItemLongClick(v, this.getAdapterPosition());
+            this.borderColor =  (LinearLayout) v.findViewById(R.id.list_card);
             return true;
         }
 
 
     }
 
-    public RecyclerEventListAdapter(Context context, int layoutResourceId, List<EventData> data,
+    public RecyclerEventListAdapter(Context context, int layoutResourceId, List<EventData> data, int color,
                                     OnItemClickListener itemClickListener, OnItemLongClickListener itemLongClickListener) {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.userColor = color;
         this.itemClickListener = itemClickListener;
         this.itemLongClickListener = itemLongClickListener;
     }
@@ -88,6 +98,10 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         EventData posData = this.data.get(position);
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
+
+        holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
+
+        //holder.borderColor.setColorFilter(userColor);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -6,16 +6,21 @@ package otk.test;
 public class UserData {
 
     private String userName;
-    private int colorValue = 0xffecd029; //Color is 0xAARRGGBB where AA is alpha (transparency)
-    private String color;
+    private int colorValue; //Color is 0xAARRGGBB where AA is alpha (transparency)
+
+    UserData(String name,int colorValue) {
+        this.userName = name;
+        this.colorValue = colorValue;
+    }
 
     UserData(String name) {
         this.userName = name;
+        this.colorValue = 0xff59a6a6;
     }
 
     UserData(UserData user) {
         this.userName = user.getUserName();
-        this.color = user.getColor();
+        this.colorValue = user.getColorValue();
     }
 
     public void setUserName(String name) {
@@ -33,13 +38,5 @@ public class UserData {
 
     public int getColorValue() {
         return this.colorValue;
-    }
-
-    public void setColor(String color) {
-        this.color = color;
-    }
-
-    public String getColor() {
-        return color;
     }
 }

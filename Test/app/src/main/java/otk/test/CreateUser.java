@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,7 +52,31 @@ public class CreateUser extends AppCompatActivity {
                 // check if passwords match
                 if (password.getText().toString().equals(confirmpassword.getText().toString())) {
                     // create the user
-                    new CreateUserTask(username.getText().toString(),password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/createuser.php");
+                    RadioGroup color_selec = (RadioGroup) findViewById(R.id.color_selector);
+                    int colorValue = 0xff59a6a6;
+                    Log.e("color3",colorValue+"");
+                    switch (color_selec.getCheckedRadioButtonId())
+                    {
+                        case R.id.user_red: colorValue = R.color.red;
+                            break;
+                        case R.id.user_blue: colorValue = R.color.blue;
+                            break;
+                        case R.id.user_green: colorValue = R.color.green;
+                            break;
+                        case R.id.user_orange: colorValue = R.color.orange;
+                            break;
+                        case R.id.user_pink: colorValue = R.color.pink;
+                            break;
+                        case R.id.user_purple: colorValue = R.color.purple;
+                            break;
+                        case R.id.user_turquoise: colorValue = R.color.turquoise;
+                            break;
+                        case R.id.user_yellow: colorValue = R.color.yellow;
+                            break;
+                        default:
+                            colorValue = 0xff59a6a6;
+                    }
+                    new CreateUserTask(username.getText().toString(),password.getText().toString(),colorValue).execute("http://findme-env.elasticbeanstalk.com/createuser.php");
                 }
                 else {
                     alert("Passwords do not match");
@@ -66,10 +91,12 @@ public class CreateUser extends AppCompatActivity {
 
         String username = "";
         String password = "";
+        int color_value = 0xff59a6a6;
 
-        public CreateUserTask(String username, String password) {
+        public CreateUserTask(String username, String password, int color_value) {
             this.username = username;
             this.password = password;
+            this.color_value = color_value;
         }
 
         @Override
@@ -91,6 +118,7 @@ public class CreateUser extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("username", username);
                 jsonParam.put("password", password);
+                jsonParam.put("color",color_value);
 
                 wr.writeBytes(jsonParam.toString());
 
@@ -118,7 +146,21 @@ public class CreateUser extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if(result.equals("200")) {
                 // successful user creation
-                Intent intent = new Intent(CreateUser.this, Login.class);
+                ((MyApplication) getApplication()).setUser(new UserData(username, color_value));
+                try {
+                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                    fos.write(username.getBytes());
+                    fos.close();
+                    FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                    fos2.write((color_value+"").getBytes());
+                    fos2.close();
+                }
+                catch (FileNotFoundException e) {
+                    Log.e("File",e.getMessage());
+                } catch (IOException e) {
+                    Log.e("io",e.getMessage());
+                }
+                Intent intent = new Intent(CreateUser.this, MainActivity.class);
                 startActivity(intent);
             }
             else if(result.equals("401")) {

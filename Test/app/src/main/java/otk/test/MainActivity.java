@@ -1,6 +1,9 @@
 package otk.test;
 
+import android.Manifest;
 import android.content.Context;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
@@ -66,38 +69,64 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         Log.d("APP STARTED", "HELLO");
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+        ActivityCompat.requestPermissions(MainActivity.this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
         // check for logged in user through
-        if (fileExists(this,"userdata")) {
+        if (fileExists("userdata") && fileExists("colordata")) {
             String username = null;
+            int color = -40;
             try {
                 FileInputStream fis = openFileInput("userdata");
                 byte[] input = new byte[fis.available()];
-                while (fis.read(input) != -1) {}
+                int count = 0;
+                while (fis.read(input) != -1 && count < 1000) {
+                    count = count + 1;
+                }
+                if (count >= 1000) {
+                    Log.e("inf loop1", "inf loop occurred in userdata");
+                }
                 username = new String(input);
                 fis.close();
+
+                FileInputStream fis2 = openFileInput("colordata");
+                byte[] colorinput = new byte[fis2.available()];
+                count = 0;
+                while (fis2.read(colorinput) != -1 && count < 1000) {
+                    count = count + 1;
+                }
+                if (count >= 1000) {
+                    Log.e("inf loop2", "inf loop occurred in colordata");
+                }
+                color = Integer.valueOf(new String(colorinput));
+                fis2.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (username != null && !username.equals("Not Logged In")) {
-                ((MyApplication) getApplication()).setUser(new UserData(username));
-            }
-            else {
+            if (username != null && !username.equals("Not Logged In") && color != -40) {
+                ((MyApplication) getApplication()).setUser(new UserData(username, color));
+            } else {
                 // re-route to login
-                Intent intent = new Intent(MainActivity.this,Login.class);
+                Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
             }
-        }
-        else {
+        } else {
             // create userdata file
             try {
                 FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                fos.write("Not Logged In".getBytes());
                 fos.close();
+                FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                fos2.write("0".getBytes());
+                fos2.close();
 
                 // re-route to login
-                Intent intent = new Intent(MainActivity.this,Login.class);
+                Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -130,6 +159,7 @@ public class MainActivity extends AppCompatActivity implements
 
         recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card,
                 ((MyApplication) getApplication()).getEventStorage(),
+                ((MyApplication) getApplication()).getUser().getColorValue(),
                 new RecyclerEventListAdapter.OnItemClickListener() {
                     @Override
                     public void onItemClick(View v, int position) {
@@ -164,125 +194,125 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-            @Override
-            public boolean onCreateOptionsMenu(Menu menu) {
-                // Inflate the menu; this adds items to the action bar if it is present.
-                getMenuInflater().inflate(R.menu.menu_main, menu);
-                return true;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        if (!mResolvingError)
+            mapClass.mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        mapClass.mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        mapClass.mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+        // The connection has been interrupted.
+        // Disable any UI components that depend on Google APIs
+        // until onConnected() is called.
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult result) {
+        if (mResolvingError) {
+            return;
+        } else if (result.hasResolution()) {
+            try {
+                mResolvingError = true;
+                result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
+            } catch (IntentSender.SendIntentException e) {
+                mapClass.mGoogleApiClient.connect();
             }
+        } else {
+            showErrorDialog(result.getErrorCode());
+            mResolvingError = true;
+        }
+    }
 
-            @Override
-            public boolean onOptionsItemSelected(MenuItem item) {
-                // Handle action bar item clicks here. The action bar will
-                // automatically handle clicks on the Home/Up button, so long
-                // as you specify a parent activity in AndroidManifest.xml.
-                int id = item.getItemId();
+    private void showErrorDialog(int errorCode) {
+        ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
+        Bundle args = new Bundle();
+        args.putInt(DIALOG_ERROR, errorCode);
+        dialogFragment.setArguments(args);
+        dialogFragment.show(getFragmentManager(), "errordialog");
+    }
 
-                //noinspection SimplifiableIfStatement
-                if (id == R.id.action_settings) {
-                    return true;
-                }
+    public void onDialogDismissed() {
+        mResolvingError = false;
+    }
 
-                return super.onOptionsItemSelected(item);
-            }
+    public static class ErrorDialogFragment extends DialogFragment {
+        public ErrorDialogFragment() {
+        }
 
-            @Override
-            protected void onStart() {
-                super.onStart();
-                if (!mResolvingError)
-                    mapClass.mGoogleApiClient.connect();
-            }
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            int errorCode = this.getArguments().getInt(DIALOG_ERROR);
+            return GoogleApiAvailability.getInstance().getErrorDialog(this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
+        }
 
-            @Override
-            protected void onStop() {
-                mapClass.mGoogleApiClient.disconnect();
-                super.onStop();
-            }
+        @Override
+        public void onDismiss(DialogInterface dialog) {
+            ((MainActivity) getActivity()).onDialogDismissed();
+        }
+    }
 
-            @Override
-            public void onConnected(Bundle connectionHint) {
-                mapClass.mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(LocationServices.API).build();
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
+    }
 
-            }
+    @Override
+    public void onLocationChanged(Location location) {
+        Toast.makeText(getApplicationContext(), "Location Changed", Toast.LENGTH_LONG).show();
+        mapClass.GetMyLoc();
+    }
 
-            @Override
-            public void onConnectionSuspended(int cause) {
-                // The connection has been interrupted.
-                // Disable any UI components that depend on Google APIs
-                // until onConnected() is called.
-            }
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-            @Override
-            public void onConnectionFailed(ConnectionResult result) {
-                if (mResolvingError) {
-                    return;
-                } else if (result.hasResolution()) {
-                    try {
-                        mResolvingError = true;
-                        result.startResolutionForResult(this, REQUEST_RESOLVE_ERROR);
-                    } catch (IntentSender.SendIntentException e) {
-                        mapClass.mGoogleApiClient.connect();
-                    }
-                } else {
-                    showErrorDialog(result.getErrorCode());
-                    mResolvingError = true;
-                }
-            }
+    }
 
-            private void showErrorDialog(int errorCode) {
-                ErrorDialogFragment dialogFragment = new ErrorDialogFragment();
-                Bundle args = new Bundle();
-                args.putInt(DIALOG_ERROR, errorCode);
-                dialogFragment.setArguments(args);
-                dialogFragment.show(getFragmentManager(), "errordialog");
-            }
+    @Override
+    public void onProviderEnabled(String provider) {
 
-            public void onDialogDismissed() {
-                mResolvingError = false;
-            }
+    }
 
-            public static class ErrorDialogFragment extends DialogFragment {
-                public ErrorDialogFragment() {
-                }
+    @Override
+    public void onProviderDisabled(String provider) {
 
-                @Override
-                public Dialog onCreateDialog(Bundle savedInstanceState) {
-                    int errorCode = this.getArguments().getInt(DIALOG_ERROR);
-                    return GoogleApiAvailability.getInstance().getErrorDialog(this.getActivity(), errorCode, REQUEST_RESOLVE_ERROR);
-                }
-
-                @Override
-                public void onDismiss(DialogInterface dialog) {
-                    ((MainActivity) getActivity()).onDialogDismissed();
-                }
-            }
-
-            @Override
-            protected void onSaveInstanceState(Bundle outState) {
-                super.onSaveInstanceState(outState);
-                outState.putBoolean(STATE_RESOLVING_ERROR, mResolvingError);
-            }
-
-            @Override
-            public void onLocationChanged(Location location) {
-                Toast.makeText(getApplicationContext(), "Location Changed", Toast.LENGTH_LONG).show();
-                mapClass.GetMyLoc();
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -293,55 +323,72 @@ public class MainActivity extends AppCompatActivity implements
                 EventData newEvent = new EventData(((MyApplication) this.getApplication()).getTempEvent());
                 final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                 mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
-
+                newEvent.setColor(((MyApplication) getApplication()).getUser().getColorValue());
+                Log.e("color", ((MyApplication) getApplication()).getUser().getColorValue() + "");
                 ((MyApplication) getApplication()).addToEventList(newEvent);
                 recyclerViewAdapter.notifyDataSetChanged();
-               //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
+                //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
             }
         }
     }
 
-    public void setLocationServices()
-    {
-        try{
-            mapClass.mLocationManager =  (LocationManager) getSystemService(LOCATION_SERVICE);
+    public void setLocationServices() {
+        try {
+            mapClass.mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
             GPSEnabled = mapClass.mLocationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             NWEnabled = mapClass.mLocationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-            if(!GPSEnabled && !NWEnabled)
+            if (!GPSEnabled && !NWEnabled)
                 Toast.makeText(getApplicationContext(), "No Services Currently Available", Toast.LENGTH_LONG).show();//No Location services available
-            else
-            {
-                if(GPSEnabled)
-                {
-                    mapClass.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
+            else {
+                if (GPSEnabled) {
+                    try {
+                        mapClass.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
+                    }
+                    catch (SecurityException e) {
+                        Log.e("Security",e.getMessage());
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    }
                     mapClass.LocProvider = "GPS_PROVIDER";
                     Toast.makeText(getApplicationContext(), "GPS Services are being used", Toast.LENGTH_LONG).show();
-                    Location_Services_On=true;
-                }
-                else if(NWEnabled)
-                {
-                    mapClass.mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
+                    Location_Services_On = true;
+                } else if (NWEnabled) {
+                    try {
+                        mapClass.mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
+                    }
+                    catch (SecurityException e) {
+                        Log.e("Security",e.getMessage());
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+                        ActivityCompat.requestPermissions(MainActivity.this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                    }
                     mapClass.LocProvider = "NETWORK_PROVIDER";
                     Toast.makeText(getApplicationContext(), "Network Services are being used", Toast.LENGTH_LONG).show();
-                    Location_Services_On=true;
+                    Location_Services_On = true;
                 }
-                if(mapClass.mLocationManager != null)
-                {
+                if (mapClass.mLocationManager != null) {
                     mapClass.GetMyLoc();
                 }
             }
-        }
-        catch(Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @Override
-    protected void onPause()
-    {
+    protected void onPause() {
         super.onPause();
-        mapClass.mLocationManager.removeUpdates(this);
+        try {
+            mapClass.mLocationManager.removeUpdates(this);
+        }
+        catch (SecurityException e) {
+            Log.e("Security",e.getMessage());
+        }
         Location_Services_On = false;
 
     }
@@ -353,12 +400,9 @@ public class MainActivity extends AppCompatActivity implements
         setLocationServices();
     }
 
-    public boolean fileExists(Context context, String filename) {
-        File file = context.getFileStreamPath(filename);
-        if(file == null || !file.exists()) {
-            return false;
-        }
-        return true;
+    public boolean fileExists(String filename) {
+        File file = getBaseContext().getFileStreamPath(filename);
+        return file.exists();
     }
 
 }

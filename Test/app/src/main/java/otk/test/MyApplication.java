@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class MyApplication extends Application {
     private List<EventData> eventStorage = new LinkedList<>();
-    private UserData currUser = new UserData("Not Logged In");
+    private UserData currUser = new UserData("Not Logged In",0);
     private EventData tempEvent;
 
 
