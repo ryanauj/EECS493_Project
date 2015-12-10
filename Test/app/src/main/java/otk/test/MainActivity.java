@@ -7,11 +7,11 @@ import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-
 import android.app.Dialog;
 import android.app.DialogFragment;
-import android.content.Intent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.location.LocationListener;
@@ -20,11 +20,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.HapticFeedbackConstants;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
@@ -32,7 +33,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
-import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
@@ -52,6 +52,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -499,8 +501,14 @@ public class MainActivity extends AppCompatActivity implements
                     MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
                     Date time = new Date();
 
+                    // Defaults
+                    int max_attend = 0; // 0 means no limit on attendance
+                    String pictureUrl = "";
+                    HashSet attendees = new HashSet();
+                    LinkedList<ForumPost> forum_list = new LinkedList<>();
 
-                    EventData newEvent = new EventData(creator, title, description, location, time, Integer.valueOf(color));
+                    EventData newEvent = new EventData(creator, title, description, pictureUrl, location, time,
+                                                       max_attend, Integer.valueOf(color), attendees, forum_list);
 
                     final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                     mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));

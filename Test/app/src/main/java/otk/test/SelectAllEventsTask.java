@@ -102,18 +102,19 @@ public class SelectAllEventsTask extends AsyncTask<String, Void, JSONArray> {
                 String imagepath = jsonObject.getString("imagepath");
                 String lat = jsonObject.getString("lat");
                 String lng = jsonObject.getString("lng");
+                String color = jsonObject.getString("color");
 
                 // Empty objects for maxAttendees, attendees, and forum_list
                 int maxAttendees = 0;
                 HashSet attendees = new HashSet();
-                LinkedList<ForumPost> forum_list = new LinkedList<ForumPost>();
+                LinkedList<ForumPost> forum_list = new LinkedList<>();
 
 
                 MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
                 Date time = new Date();
 
                 ((MyApplication) context.getApplicationContext()).addToEventList(new EventData(creator, title, description, imagepath, location,
-                                                                                                time, maxAttendees, attendees, forum_list));
+                                                                                    time, maxAttendees, Integer.valueOf(color), attendees, forum_list));
             }
         } catch (JSONException e) {
             Log.e("JSONException", e.getMessage());

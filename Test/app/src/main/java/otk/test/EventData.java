@@ -33,7 +33,7 @@ public class EventData {
     }
 
     EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location,
-              Date time, int max_attend, HashSet attendees, LinkedList<ForumPost> forum_list) {
+              Date time, int max_attend, int color, HashSet attendees, LinkedList<ForumPost> forum_list) {
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -43,14 +43,6 @@ public class EventData {
         this.max_attend = max_attend;
         this.attendees = attendees;
         this.forum_list = forum_list;
-    }
-
-    EventData(String creator, String title, String description, MarkerOptions location, Date time, int color) {
-        this.creator = creator;
-        this.title = title;
-        this.description = description;
-        this.location = location;
-        this.time = time;
         this.color = color;
     }
 

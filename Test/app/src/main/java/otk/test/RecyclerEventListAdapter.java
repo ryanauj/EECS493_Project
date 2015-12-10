@@ -38,7 +38,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         // each data item is just a string in this case
-        public TextView txtCreator,txtDescription,rsvpCount,txtTime;
+        public TextView txtCreator, txtDescription, txtDate, txtAttendance;
         public OnItemClickListener clickListener;
         public OnItemLongClickListener longClickListener;
         public LinearLayout borderColor;
@@ -49,9 +49,11 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
             this.longClickListener = itemLongClickListener;
             this.txtCreator = (TextView) v.findViewById(R.id.eventCreator);
             this.txtDescription = (TextView) v.findViewById(R.id.eventTitle);
+            this.txtDate = (TextView) v.findViewById(R.id.Time_slot);
+            this.txtAttendance = (TextView) v.findViewById(R.id.Attendance);
             this.borderColor = (LinearLayout) v.findViewById(R.id.bordercolor);
-            this.rsvpCount = (TextView) v.findViewById(R.id.Attendance);
-            this.txtTime = (TextView) v.findViewById(R.id.Time_slot);
+            //this.rsvpCount = (TextView) v.findViewById(R.id.Attendance);
+            //this.txtTime = (TextView) v.findViewById(R.id.Time_slot);
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
         }
@@ -108,19 +110,17 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
 
+        holder.txtDate.setText(posData.getTime().toString());
+
+        String maxAttendees = context.getResources().getString(R.string.infinity);
+        if (posData.getMaxAttendees() != 0) {
+            maxAttendees = String.valueOf(posData.getMaxAttendees());
+        }
+        holder.txtAttendance.setText(String.valueOf(posData.getAttendees().size()) +
+                                     " / " + posData.getMaxAttendees());
+
         if(holder.borderColor!=null)
             holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
-
-        String rsvpString = String.valueOf(posData.getNumAttendees()) + " / " + String.valueOf(posData.getMaxAttendees());
-        if(holder.rsvpCount!=null)
-            holder.rsvpCount.setText(rsvpString);
-
-        if(holder.txtTime!=null)
-        {
-            holder.txtTime.setText(String.valueOf(posData.getTime().getHours())+':'+String.valueOf(posData.getTime().getMinutes()));
-        }
-
-        //holder.borderColor.setColorFilter(userColor);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
