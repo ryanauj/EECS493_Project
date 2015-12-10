@@ -3,6 +3,7 @@ package otk.test;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -34,12 +35,25 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -164,6 +178,9 @@ public class MainActivity extends AppCompatActivity implements
 
                 Intent createEventIntent = new Intent(MainActivity.this, CreateEvent.class);
                 startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
+
+                new SelectAllEventsTask().execute("http://findme-env.elasticbeanstalk.com/selectallevents.php");
+                // display all events
             }
         });
 
@@ -213,6 +230,8 @@ public class MainActivity extends AppCompatActivity implements
 
         //Set location updates
         setLocationServices();
+
+        new SelectAllEventsTask().execute("http://findme-env.elasticbeanstalk.com/selectallevents.php");
     }
 
 
@@ -425,6 +444,94 @@ public class MainActivity extends AppCompatActivity implements
     public boolean fileExists(String filename) {
         File file = getBaseContext().getFileStreamPath(filename);
         return file.exists();
+    }
+
+    public class SelectAllEventsTask extends AsyncTask<String, Void, JSONArray> {
+        // http://findme-env.elasticbeanstalk.com/selectallevents.php
+
+        @Override
+        protected JSONArray doInBackground(String... url) {
+            return loadJSONArray(url[0]);
+        }
+
+        protected void onPostExecute(JSONArray jsonArray) {
+            populateVector(jsonArray);
+            ((MyApplication) getApplicationContext()).logEventList();
+        }
+
+        public JSONArray loadJSONArray(String url) {
+            InputStream inputStream = null;
+            JSONArray jsonArray = null;
+            String json = "";
+
+            // get inputstream from url
+            try {
+                URL urlname = new URL(url);
+                URLConnection conn = urlname.openConnection();
+                inputStream = conn.getInputStream();
+
+            } catch (MalformedURLException e) {
+                Log.e("MalformedURLException", e.getMessage());
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            }
+
+            // read content into string
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"), 8);
+                StringBuilder stringBuilder = new StringBuilder();
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line + "\n");
+                }
+                inputStream.close();
+                json = stringBuilder.toString();
+            } catch (UnsupportedEncodingException e) {
+                Log.e("UnsupportedEncoding", e.getMessage());
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            }
+
+            // create jsonArray from string
+            try {
+                jsonArray = new JSONArray(json);
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+            }
+
+            return jsonArray;
+        }
+
+
+        public void populateVector(JSONArray jsonArray) {
+            // parse jsonArray into eventData objects
+            try{
+                ((MyApplication) getApplicationContext()).clearEventStorage();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    //String id = jsonObject.getString("id");
+                    String title = jsonObject.getString("title");
+                    String creator = jsonObject.getString("creator");
+                    //String date = jsonObject.getString("date");
+                    String description = jsonObject.getString("description");
+                    String lat = jsonObject.getString("lat");
+                    String lng = jsonObject.getString("lng");
+                    String color = jsonObject.getString("color");
+
+                    MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
+                    Date time = new Date();
+
+                    ((MyApplication) getApplicationContext()).addToEventList(new EventData(creator, title, description, location, time, Integer.valueOf(color)));
+
+                }
+                // done loading all events
+                recyclerViewAdapter.notifyDataSetChanged();
+                recyclerView.setAdapter(recyclerViewAdapter);
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+            }
+        }
+
     }
 
 }

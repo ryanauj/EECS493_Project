@@ -6,6 +6,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.AsyncTask;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -28,9 +29,15 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -114,11 +121,10 @@ public class CreateEvent extends AppCompatActivity {
                 createEventData.setDescription(descriptionView.getText().toString());
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
+                createEventData.setColor(((MyApplication) getApplication()).getUser().getColorValue());
                 ((MyApplication) getApplication()).setTempEvent(createEventData);
 
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
+                new CreateEventTask(createEventData).execute("http://findme-env.elasticbeanstalk.com/createevent.php");
                 //Log.e("time", timeView.getHour()+" "+timeView.getMinute()+timeView.getBaseline());
                 //Log.e("date", dateView.getMonth() + " " + dateView.getDayOfMonth() + " " + dateView.getYear());
             }
@@ -220,6 +226,74 @@ public class CreateEvent extends AppCompatActivity {
     public static void hideSoftKeyboard(Activity activity) {
         InputMethodManager inputMethodManager = (InputMethodManager)  activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+    }
+
+    public class CreateEventTask extends AsyncTask<String, Void, Boolean> {
+        // http://findme-env.elasticbeanstalk.com/createevent.php
+
+        EventData event = new EventData();
+
+        public CreateEventTask(EventData event) {
+            this.event = event;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... url) {
+            try {
+                URL urlname = new URL(url[0]);
+                HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("POST");
+                //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                //conn.setRequestProperty("charset", "utf-8");
+                //conn.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
+                //conn.setUseCaches(false);
+                conn.setChunkedStreamingMode(0);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("title", event.getTitle());
+                jsonParam.put("creator", event.getCreator());
+                jsonParam.put("description", event.getDescription());
+                jsonParam.put("date", event.getTime());
+                LatLng location = event.getLocation().getPosition();
+                jsonParam.put("lat", Double.toString(location.latitude));
+                jsonParam.put("lng", Double.toString(location.longitude));
+                jsonParam.put("color",Integer.toString(event.getColor()));
+
+                wr.writeBytes(jsonParam.toString());
+
+                wr.flush();
+                wr.close();
+
+                conn.disconnect();
+
+            } catch (MalformedURLException e) {
+                Log.e("MalformedURL", e.getMessage());
+                return false;
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+                return false;
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+                return false;
+            }
+
+            return true;
+        }
+
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                Log.e("PostUpload","Success");
+                Intent intent = new Intent();
+                setResult(RESULT_OK, intent);
+                finish();
+            }
+            else {
+                Log.e("PostUpload","Failure");
+            }
+        }
     }
 
 }

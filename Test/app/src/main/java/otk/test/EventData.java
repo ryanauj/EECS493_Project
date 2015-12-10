@@ -34,6 +34,15 @@ public class EventData {
         this.time = time;
     }
 
+    EventData(String creator, String title, String description, MarkerOptions location, Date time, int color) {
+        this.creator = creator;
+        this.title = title;
+        this.description = description;
+        this.location = location;
+        this.time = time;
+        this.color = color;
+    }
+
     EventData(EventData replicateEvent)
     {
         this.creator=replicateEvent.getCreator();
@@ -43,6 +52,7 @@ public class EventData {
         this.time = replicateEvent.getTime();
         this.title = replicateEvent.getTitle();
         this.location = replicateEvent.getLocation();
+        this.color = replicateEvent.getColor();
     }
 
     public void setCreator(String creator) {
@@ -114,8 +124,7 @@ public class EventData {
                 + "\ncreator:" + this.creator
                 + "\ndescription:" + this.description
                 + "\nlocation:" + this.location.toString()
-                + "\ndatetime:" + this.time.toString()
-                + "\nimagepath" + this.pictureUrl;
+                + "\ndatetime:" + this.time.toString();
     }
 
     @Override
