@@ -56,21 +56,21 @@ public class CreateUser extends AppCompatActivity {
                     int colorValue = 0xff59a6a6;
                     switch (color_selec.getCheckedRadioButtonId())
                     {
-                        case R.id.user_red: colorValue = 0xffb30000;
+                        case R.id.user_red: colorValue = R.color.red;
                             break;
-                        case R.id.user_blue: colorValue = 0xff0066ff;
+                        case R.id.user_blue: colorValue = R.color.blue;
                             break;
-                        case R.id.user_green: colorValue = 0xff33cc33;
+                        case R.id.user_green: colorValue = R.color.green;
                             break;
-                        case R.id.user_orange: colorValue = 0xffff6600;
+                        case R.id.user_orange: colorValue = R.color.orange;
                             break;
-                        case R.id.user_pink: colorValue = 0xffff0066;
+                        case R.id.user_pink: colorValue = R.color.pink;
                             break;
-                        case R.id.user_purple: colorValue = 0xffc51aff;
+                        case R.id.user_purple: colorValue = R.color.purple;
                             break;
-                        case R.id.user_turquoise: colorValue = 0xff33ccff;
+                        case R.id.user_turquoise: colorValue = R.color.turquoise;
                             break;
-                        case R.id.user_yellow: colorValue = 0xffffcc00;
+                        case R.id.user_yellow: colorValue = R.color.yellow;
                             break;
                         default:
                             colorValue = 0xff59a6a6;
