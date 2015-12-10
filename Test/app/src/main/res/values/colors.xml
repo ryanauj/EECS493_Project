@@ -5,4 +5,15 @@
     <color name="colorAccent">#FF4081</color>
     <color name="appColor">#59a6a6</color>
     <color name="black">#000000</color>
+
+
+    <color name="pink">#ff0066</color>
+    <color name="blue">#0066ff</color>
+    <color name="purple">#c51aff</color>
+    <color name="green">#33cc33</color>
+
+    <color name="turquoise">#33ccff</color>
+    <color name="yellow">#ffcc00</color>
+    <color name="orange">#ff6600</color>
+    <color name="red">#b30000</color>
 </resources>

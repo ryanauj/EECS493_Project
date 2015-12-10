@@ -59,7 +59,7 @@ public class Login extends AppCompatActivity {
             logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In"));
+                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",0));
                     String FILENAME = "userdata";
 
                     try {
@@ -144,7 +144,7 @@ public class Login extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if(result.equals("200")) {
                 // successful login
-                ((MyApplication) getApplication()).setUser(new UserData(username));
+                ((MyApplication) getApplication()).setUser(new UserData(username,0));
                 String FILENAME = "userdata";
 
                 try {

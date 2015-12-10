@@ -12,7 +12,7 @@ public class EventData {
     private MarkerOptions location = new MarkerOptions();
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
-    private int max_attend,total_rsvp;
+    private int max_attend,total_rsvp,color;
 
     EventData() {
         this.creator = "";
@@ -22,6 +22,7 @@ public class EventData {
         this.location = new MarkerOptions();
         this.location.position(new LatLng(0,0));
         this.time = new Date();
+        this.color = 0xffffffff;//Hex for black
     }
 
     EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location, Date time) {
@@ -94,6 +95,14 @@ public class EventData {
 
     public String getNameOfLocation() {
         return nameOfLocation;
+    }
+
+    public void setColor(int color) {
+        this.color=color;
+    }
+
+    public int getColor() {
+        return color;
     }
 
     public String getPictureUrl() {

@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements
         // check for logged in user through
         if (fileExists(this,"userdata")) {
             String username = null;
+            int color = 0xff000000;
             try {
                 FileInputStream fis = openFileInput("userdata");
                 byte[] input = new byte[fis.available()];
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
                 e.printStackTrace();
             }
             if (username != null && !username.equals("Not Logged In")) {
-                ((MyApplication) getApplication()).setUser(new UserData(username));
+                ((MyApplication) getApplication()).setUser(new UserData(username,color));
             }
             else {
                 // re-route to login
@@ -146,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements
         recyclerViewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-        recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
+        recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage(), ((MyApplication) getApplication()).getUser().getColorValue());
         recyclerView.setAdapter(recyclerViewAdapter);
 
         recyclerView.addOnItemTouchListener(
@@ -316,7 +317,7 @@ public class MainActivity extends AppCompatActivity implements
                 EventData newEvent = new EventData(((MyApplication) this.getApplication()).getTempEvent());
                 final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                 mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
-
+                newEvent.setColor(((MyApplication) getApplication()).getUser().getColorValue());
                 ((MyApplication) getApplication()).addToEventList(newEvent);
                 recyclerViewAdapter.notifyDataSetChanged();
                //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));

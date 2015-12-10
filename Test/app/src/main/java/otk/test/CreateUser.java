@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.RadioGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,7 +52,30 @@ public class CreateUser extends AppCompatActivity {
                 // check if passwords match
                 if (password.getText().toString().equals(confirmpassword.getText().toString())) {
                     // create the user
-                    new CreateUserTask(username.getText().toString(),password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/createuser.php");
+                    RadioGroup color_selec = (RadioGroup) findViewById(R.id.color_selector);
+                    int colorValue = 0xff59a6a6;
+                    switch (color_selec.getCheckedRadioButtonId())
+                    {
+                        case R.id.user_red: colorValue = 0xffb30000;
+                            break;
+                        case R.id.user_blue: colorValue = 0xff0066ff;
+                            break;
+                        case R.id.user_green: colorValue = 0xff33cc33;
+                            break;
+                        case R.id.user_orange: colorValue = 0xffff6600;
+                            break;
+                        case R.id.user_pink: colorValue = 0xffff0066;
+                            break;
+                        case R.id.user_purple: colorValue = 0xffc51aff;
+                            break;
+                        case R.id.user_turquoise: colorValue = 0xff33ccff;
+                            break;
+                        case R.id.user_yellow: colorValue = 0xffffcc00;
+                            break;
+                        default:
+                            colorValue = 0xff59a6a6;
+                    }
+                    new CreateUserTask(username.getText().toString(),password.getText().toString(),colorValue).execute("http://findme-env.elasticbeanstalk.com/createuser.php");
                 }
                 else {
                     alert("Passwords do not match");
@@ -66,10 +90,12 @@ public class CreateUser extends AppCompatActivity {
 
         String username = "";
         String password = "";
+        int color_value = 0xff59a6a6;
 
-        public CreateUserTask(String username, String password) {
+        public CreateUserTask(String username, String password, int color_value) {
             this.username = username;
             this.password = password;
+            this.color_value = color_value;
         }
 
         @Override
@@ -118,7 +144,8 @@ public class CreateUser extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if(result.equals("200")) {
                 // successful user creation
-                Intent intent = new Intent(CreateUser.this, Login.class);
+                ((MyApplication) getApplication()).setUser(new UserData(username,color_value));
+                Intent intent = new Intent(CreateUser.this, MainActivity.class);
                 startActivity(intent);
             }
             else if(result.equals("401")) {
