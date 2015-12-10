@@ -28,6 +28,7 @@ proguard/
 
 # API Key Files
 /Test/app/src/debug/res/values/google_maps_api.xml
+Test/app/src/debug/res/values/google_maps_api.xml
 
 # # Crashlytics configuations
 # com_crashlytics_export_strings.xml

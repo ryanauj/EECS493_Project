@@ -14,6 +14,7 @@ public class MyApplication extends Application {
     private UserData currUser = new UserData("Not Logged In");
     private EventData tempEvent;
 
+
     public void setTempEvent(EventData event)
     {
         tempEvent = event;

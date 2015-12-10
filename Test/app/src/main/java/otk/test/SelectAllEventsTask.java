@@ -20,6 +20,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Created by Andrew on 12/3/2015.
@@ -101,10 +103,17 @@ public class SelectAllEventsTask extends AsyncTask<String, Void, JSONArray> {
                 String lat = jsonObject.getString("lat");
                 String lng = jsonObject.getString("lng");
 
+                // Empty objects for maxAttendees, attendees, and forum_list
+                int maxAttendees = 0;
+                HashSet attendees = new HashSet();
+                LinkedList<ForumPost> forum_list = new LinkedList<ForumPost>();
+
+
                 MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
                 Date time = new Date();
 
-                ((MyApplication) context.getApplicationContext()).addToEventList(new EventData(creator, title, description, imagepath, location, time));
+                ((MyApplication) context.getApplicationContext()).addToEventList(new EventData(creator, title, description, imagepath, location,
+                                                                                                time, maxAttendees, attendees, forum_list));
             }
         } catch (JSONException e) {
             Log.e("JSONException", e.getMessage());

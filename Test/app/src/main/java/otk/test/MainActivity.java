@@ -19,8 +19,6 @@ import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -46,16 +44,10 @@ public class MainActivity extends AppCompatActivity implements
     private boolean mResolvingError = false;
     private static final String STATE_RESOLVING_ERROR = "resolving_error";
 
-    private EventListAdapter adapter;
-    //private ArrayAdapter<EventData> adapter;
-
-    //private List<EventData> eventListStorage = new LinkedList<EventData>();
-
     //All Google Map Variables
     private GoogleMap mMap;
     private MapsActivity mapClass = new MapsActivity();
 
-    //private LocationManager locMang;
     private Boolean GPSEnabled, NWEnabled;
 
     private long LOCATION_REFRESH_TIME = 100000;
@@ -72,10 +64,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
-        //UserData initUser = new UserData("Tim");
-        //((MyApplication) getApplication()).setUser(initUser);
 
         Log.d("APP STARTED", "HELLO");
 
@@ -123,9 +111,6 @@ public class MainActivity extends AppCompatActivity implements
         mapFragment.getMapAsync(mapClass);
         mapFragment.getMap().setOnMapClickListener(mapClass);
 
-        //UserData mainUser = new UserData("Stannis Baratheon");
-        //((MyApplication) getApplication()).setUser(mainUser);
-
         mapFragment.getMap().setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng point) {
@@ -138,40 +123,32 @@ public class MainActivity extends AppCompatActivity implements
             }
         });
 
-        //adapter =new EventListAdapter(this,R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
-        //ListView listView1 = (ListView) findViewById(R.id.eventListView);
-
         recyclerView = (RecyclerView) findViewById(R.id.eventRecyclerView);
 
         recyclerViewLayoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(recyclerViewLayoutManager);
 
-        recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card, ((MyApplication) getApplication()).getEventStorage());
-        recyclerView.setAdapter(recyclerViewAdapter);
-
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+        recyclerViewAdapter = new RecyclerEventListAdapter(this, R.layout.event_list_card,
+                ((MyApplication) getApplication()).getEventStorage(),
+                new RecyclerEventListAdapter.OnItemClickListener() {
                     @Override
-                    public void onItemClick(View view, int position) {
+                    public void onItemClick(View v, int position) {
+                        EventData data = recyclerViewAdapter.getItemAtPosition(position);
+                        mapClass.moveCamToLocationSmooth(data.getLocation().getPosition());
+                    }
+                },
+                new RecyclerEventListAdapter.OnItemLongClickListener() {
+                    @Override
+                    public void onItemLongClick(View view, int position) {
+                        Log.d("Recycler Item", "Long click");
                         EventData data = recyclerViewAdapter.getItemAtPosition(position);
                         ((MyApplication) getApplication()).setTempEvent(data);
                         Intent intent = new Intent(MainActivity.this, Event_Details.class);
                         startActivity(intent);
                     }
-                })
+                }
         );
-
-//        listView1.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                EventData data = (EventData) parent.getItemAtPosition(position);
-//                ((MyApplication) getApplication()).setTempEvent(data);
-//                Intent intent = new Intent(MainActivity.this, Event_Details.class);
-//                startActivity(intent);
-//            }
-//        });
-//
-//        listView1.setAdapter(adapter);
+        recyclerView.setAdapter(recyclerViewAdapter);
 
 
         //Build Google Client to communicate with google play services

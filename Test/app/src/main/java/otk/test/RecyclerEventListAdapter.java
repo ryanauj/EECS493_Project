@@ -16,24 +16,56 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
     Context context;
     int layoutResourceId;
     List<EventData> data=null;
+    private OnItemClickListener itemClickListener;
+    private OnItemLongClickListener itemLongClickListener;
+
+    public interface OnItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public interface OnItemLongClickListener {
+        void onItemLongClick(View view, int position);
+    }
 
 // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         // each data item is just a string in this case
         public TextView txtCreator,txtDescription;
-        public ViewHolder(View v) {
+        public OnItemClickListener clickListener;
+        public OnItemLongClickListener longClickListener;
+        public ViewHolder(View v, OnItemClickListener itemClickListener, OnItemLongClickListener itemLongClickListener) {
             super(v);
+            this.clickListener = itemClickListener;
+            this.longClickListener = itemLongClickListener;
             this.txtCreator = (TextView) v.findViewById(R.id.eventCreator);
             this.txtDescription = (TextView) v.findViewById(R.id.eventTitle);
+            v.setOnClickListener(this);
+            v.setOnLongClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            clickListener.onItemClick(v, this.getAdapterPosition());
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            longClickListener.onItemLongClick(v, this.getAdapterPosition());
+            return true;
+        }
+
+
     }
 
-    public RecyclerEventListAdapter(Context context, int layoutResourceId, List<EventData> data) {
+    public RecyclerEventListAdapter(Context context, int layoutResourceId, List<EventData> data,
+                                    OnItemClickListener itemClickListener, OnItemLongClickListener itemLongClickListener) {
         this.layoutResourceId = layoutResourceId;
         this.context = context;
         this.data = data;
+        this.itemClickListener = itemClickListener;
+        this.itemLongClickListener = itemLongClickListener;
     }
 
     // Create new views (invoked by the layout manager)
@@ -44,7 +76,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         // set the view's size, margins, paddings and layout parameters
         // ...
 
-        ViewHolder vh = new ViewHolder(v);
+        ViewHolder vh = new ViewHolder(v, itemClickListener, itemLongClickListener);
         return vh;
     }
 

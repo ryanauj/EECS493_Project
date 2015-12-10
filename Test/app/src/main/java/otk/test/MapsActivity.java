@@ -101,6 +101,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
+    public void moveCamToLocation(LatLng loc) {
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(loc));
+    }
 
-
+    public void moveCamToLocationSmooth(LatLng loc) {
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(loc));
+    }
 }
