@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="otk.test.Event_Details">
+    tools:context="otk.test.Event_Details"
+    android:fillViewport="false">
 
     <!-- Data structure:
         Creator
@@ -107,6 +108,95 @@
             android:textColor="#222222"
             android:textSize="14dp"
             android:text="This is the event's description. Describe what is happening here. This textview should be allowed to span multiple lines inorder for large descriptions to be made."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:textSize="20dp"
+                android:layout_weight="0.5"
+                android:layout_marginLeft="10dp"
+                android:text="RSVPs: "/>
+
+            <TextView
+                android:id="@+id/total_attendees"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:textSize="20dp"
+                android:text="#/#"/>
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/rsvp_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/appColor"
+            android:text="RSVP To Event"/>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
+s
+            <Button
+                android:id="@+id/cancel_post"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:text="Cancel"
+                android:background="#d42929"
+                android:visibility="invisible"
+                android:enabled="false"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:padding="10dp"
+                android:paddingBottom="5dp"
+                android:textSize="20dp"
+                android:layout_weight="1"
+
+                android:text="Forum"/>
+
+            <Button
+                android:id="@+id/add_post_button"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_weight="1"
+                android:padding="10dp"
+                android:text="Add Post"/>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/edit_post_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
+
+        <otk.test.ExpandableHeightListView
+            android:id="@+id/forum_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fadingEdge="none"
+            android:focusable="false"
+            android:scrollbars="none">
+        </otk.test.ExpandableHeightListView>
 
     </LinearLayout>
 

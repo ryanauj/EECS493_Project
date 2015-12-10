@@ -4,6 +4,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 /**
  * Created by Andrew on 11/14/2015.
@@ -12,7 +14,9 @@ public class EventData {
     private MarkerOptions location = new MarkerOptions();
     private String creator, title, description, nameOfLocation, pictureUrl;
     private Date time;
-    private int max_attend,total_rsvp,color;
+    private int max_attend, color;
+    private HashSet attendees;
+    private LinkedList<ForumPost> forum_list;
 
     EventData() {
         this.creator = "";
@@ -22,16 +26,23 @@ public class EventData {
         this.location = new MarkerOptions();
         this.location.position(new LatLng(0,0));
         this.time = new Date();
+        this.max_attend = 0;
+        this.attendees = new HashSet();
+        this.forum_list = new LinkedList<>();
         this.color = 0xffffffff;//Hex for black
     }
 
-    EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location, Date time) {
+    EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location,
+              Date time, int max_attend, HashSet attendees, LinkedList<ForumPost> forum_list) {
         this.creator = creator;
         this.title = title;
         this.description = description;
         this.pictureUrl = pictureUrl;
         this.location = location;
         this.time = time;
+        this.max_attend = max_attend;
+        this.attendees = attendees;
+        this.forum_list = forum_list;
     }
 
     EventData(String creator, String title, String description, MarkerOptions location, Date time, int color) {
@@ -53,6 +64,9 @@ public class EventData {
         this.title = replicateEvent.getTitle();
         this.location = replicateEvent.getLocation();
         this.color = replicateEvent.getColor();
+        this.max_attend = replicateEvent.getMaxAttendees();
+        this.attendees = replicateEvent.getAttendees();
+        this.forum_list = replicateEvent.getForumList();
     }
 
     public void setCreator(String creator) {
@@ -81,6 +95,14 @@ public class EventData {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void setMaxAttendees(int max) { this.max_attend = max; }
+
+    public void addAttendee(String attendee) { this.attendees.add(attendee); }
+
+    public void addMessageToForum(String user, String message) {
+        forum_list.addFirst(new ForumPost(user, message));
     }
 
     public Date getTime() {
@@ -118,6 +140,12 @@ public class EventData {
     public String getPictureUrl() {
         return pictureUrl;
     }
+
+    public int getMaxAttendees() { return max_attend; }
+
+    public HashSet getAttendees() { return attendees; }
+
+    public LinkedList<ForumPost> getForumList() { return forum_list; }
 
     public String dataToString() {
         return "title:" + this.title
