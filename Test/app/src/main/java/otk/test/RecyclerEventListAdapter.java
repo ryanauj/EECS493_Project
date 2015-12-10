@@ -2,6 +2,7 @@ package otk.test;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +64,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
         holder.borderColor.setBackgroundColor(posData.getColor());
+        Log.e("color2", posData.getColor() + "");
         //holder.borderColor.setColorFilter(userColor);
     }
 

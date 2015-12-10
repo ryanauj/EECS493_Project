@@ -1,5 +1,6 @@
 package otk.test;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -7,11 +8,13 @@ import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Vibrator;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,7 +31,9 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener{
+import java.security.Permission;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
     private GoogleApiClient ourClient;
@@ -61,8 +66,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
-        prevLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if(prevLocation!=null) {
+
+        try {
+            prevLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        } catch (SecurityException e) {
+            Log.e("security", e.getMessage());
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        }
+        if (prevLocation != null) {
             LatLng cur_loc = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
             //mMap.addMarker(new MarkerOptions().position(cur_loc).title("Current Location"));
             mMap.moveCamera(CameraUpdateFactory.newLatLng(cur_loc));
@@ -74,15 +89,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     @Override
-    public void onMapClick(LatLng point)
-    {
+    public void onMapClick(LatLng point) {
     }
 
-    public void GetMyLoc()
-    {
-        if(LocProvider!=null)
-        {
-            prevLocation = mLocationManager.getLastKnownLocation(LocProvider);
+    public void GetMyLoc() {
+        if (LocProvider != null) {
+            try {
+                prevLocation = mLocationManager.getLastKnownLocation(LocProvider);
+            }
+            catch (SecurityException e) {
+                Log.e("Security",e.getMessage());
+                ActivityCompat.requestPermissions(MapsActivity.this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+                ActivityCompat.requestPermissions(MapsActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            }
             if (prevLocation != null) {
                 LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
                 mMap.moveCamera(CameraUpdateFactory.newLatLng(pos));

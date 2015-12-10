@@ -54,6 +54,7 @@ public class CreateUser extends AppCompatActivity {
                     // create the user
                     RadioGroup color_selec = (RadioGroup) findViewById(R.id.color_selector);
                     int colorValue = 0xff59a6a6;
+                    Log.e("color3",colorValue+"");
                     switch (color_selec.getCheckedRadioButtonId())
                     {
                         case R.id.user_red: colorValue = 0xffb30000;
@@ -117,6 +118,7 @@ public class CreateUser extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("username", username);
                 jsonParam.put("password", password);
+                jsonParam.put("color",color_value);
 
                 wr.writeBytes(jsonParam.toString());
 
@@ -144,7 +146,20 @@ public class CreateUser extends AppCompatActivity {
         protected void onPostExecute(String result) {
             if(result.equals("200")) {
                 // successful user creation
-                ((MyApplication) getApplication()).setUser(new UserData(username,color_value));
+                ((MyApplication) getApplication()).setUser(new UserData(username, color_value));
+                try {
+                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                    fos.write(username.getBytes());
+                    fos.close();
+                    FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                    fos2.write((color_value+"").getBytes());
+                    fos2.close();
+                }
+                catch (FileNotFoundException e) {
+                    Log.e("File",e.getMessage());
+                } catch (IOException e) {
+                    Log.e("io",e.getMessage());
+                }
                 Intent intent = new Intent(CreateUser.this, MainActivity.class);
                 startActivity(intent);
             }
