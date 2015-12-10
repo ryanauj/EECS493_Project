@@ -51,7 +51,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
             this.txtDescription = (TextView) v.findViewById(R.id.eventTitle);
             this.txtDate = (TextView) v.findViewById(R.id.Time_slot);
             this.txtAttendance = (TextView) v.findViewById(R.id.Attendance);
-            this.borderColor = (LinearLayout) v.findViewById(R.id.list_card);
+            this.borderColor = (LinearLayout) v.findViewById(R.id.bordercolor);
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
         }
@@ -64,7 +64,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         @Override
         public boolean onLongClick(View v) {
             this.longClickListener.onItemLongClick(v, this.getAdapterPosition());
-            this.borderColor =  (LinearLayout) v.findViewById(R.id.list_card);
+            this.borderColor =  (LinearLayout) v.findViewById(R.id.bordercolor);
             return true;
         }
 
@@ -79,6 +79,12 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         this.userColor = color;
         this.itemClickListener = itemClickListener;
         this.itemLongClickListener = itemLongClickListener;
+    }
+
+    public void setList(List<EventData> data)
+    {
+        this.data=data;
+        return;
     }
 
     // Create new views (invoked by the layout manager)
@@ -110,9 +116,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         holder.txtAttendance.setText(String.valueOf(posData.getAttendees().size()) +
                                      " / " + posData.getMaxAttendees());
 
-        holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
-
-        //holder.borderColor.setColorFilter(userColor);
+        if(holder.borderColor!=null)
+            holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
     }
 
     // Return the size of your dataset (invoked by the layout manager)

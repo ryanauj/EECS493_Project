@@ -23,13 +23,21 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp">
         <!--
                 <ImageView
                     android:id="@+id/event_picture"
                     android:layout_width="match_parent"
                     android:layout_height="200dp"
                     android:background="#AAAAAA"/>-->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="40dp"
+            android:gravity="center"
+            android:text="Event Details"
+            android:textColor="@color/appColor"/>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,20 +53,6 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/event_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:textColor="#222222"
-            android:textSize="22dp"
-            android:text="This is the event's title."/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#AAAAAA"></LinearLayout>
-
-        <TextView
             android:id="@+id/event_creator"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -66,6 +60,20 @@
             android:textColor="#222222"
             android:textSize="16dp"
             android:text="This is the event's creator."/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#AAAAAA"></LinearLayout>
+
+        <TextView
+            android:id="@+id/event_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textColor="#222222"
+            android:textSize="22dp"
+            android:text="This is the event's title."/>
 
         <LinearLayout
             android:layout_width="match_parent"

@@ -33,7 +33,7 @@ public class EventData {
     }
 
     EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location,
-              Date time, int max_attend, HashSet attendees, LinkedList<ForumPost> forum_list) {
+              Date time, int max_attend, int color, HashSet attendees, LinkedList<ForumPost> forum_list) {
         this.creator = creator;
         this.title = title;
         this.description = description;
@@ -43,6 +43,7 @@ public class EventData {
         this.max_attend = max_attend;
         this.attendees = attendees;
         this.forum_list = forum_list;
+        this.color = color;
     }
 
     EventData(EventData replicateEvent)
@@ -54,6 +55,7 @@ public class EventData {
         this.time = replicateEvent.getTime();
         this.title = replicateEvent.getTitle();
         this.location = replicateEvent.getLocation();
+        this.color = replicateEvent.getColor();
         this.max_attend = replicateEvent.getMaxAttendees();
         this.attendees = replicateEvent.getAttendees();
         this.forum_list = replicateEvent.getForumList();
@@ -142,8 +144,7 @@ public class EventData {
                 + "\ncreator:" + this.creator
                 + "\ndescription:" + this.description
                 + "\nlocation:" + this.location.toString()
-                + "\ndatetime:" + this.time.toString()
-                + "\nimagepath" + this.pictureUrl;
+                + "\ndatetime:" + this.time.toString();
     }
 
     @Override
