@@ -67,8 +67,9 @@ public class Event_Details extends AppCompatActivity {
             public void onClick(View v) {
                 sampleData.addAttendee(loggedInUser);
                 disableButton(rsvp);
+
                 totalAttendees.setText(String.valueOf(sampleData.getAttendees().size()) +
-                        " / " + maxAttendees);
+                                        " / " + maxAttendees);
                 ((MyApplication) getApplication()).setTempEvent(sampleData);
             }
         });
@@ -100,6 +101,7 @@ public class Event_Details extends AppCompatActivity {
                 cancelButton.setVisibility(View.VISIBLE);
                 cancelButton.setEnabled(true);
                 addPost.setOnClickListener(addPostNotClicked);
+                CreateEvent.hideSoftKeyboard(Event_Details.this);
             }
         };
 

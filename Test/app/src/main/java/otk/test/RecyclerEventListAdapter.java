@@ -38,7 +38,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
     // you provide access to all the views for a data item in a view holder
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         // each data item is just a string in this case
-        public TextView txtCreator,txtDescription;
+        public TextView txtCreator, txtDescription, txtDate, txtAttendance;
         public OnItemClickListener clickListener;
         public OnItemLongClickListener longClickListener;
         public LinearLayout borderColor;
@@ -49,6 +49,9 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
             this.longClickListener = itemLongClickListener;
             this.txtCreator = (TextView) v.findViewById(R.id.eventCreator);
             this.txtDescription = (TextView) v.findViewById(R.id.eventTitle);
+            this.txtDate = (TextView) v.findViewById(R.id.Time_slot);
+            this.txtAttendance = (TextView) v.findViewById(R.id.Attendance);
+            this.borderColor = (LinearLayout) v.findViewById(R.id.list_card);
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
         }
@@ -98,6 +101,14 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         EventData posData = this.data.get(position);
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
+        holder.txtDate.setText(posData.getTime().toString());
+
+        String maxAttendees = context.getResources().getString(R.string.infinity);
+        if (posData.getMaxAttendees() != 0) {
+            maxAttendees = String.valueOf(posData.getMaxAttendees());
+        }
+        holder.txtAttendance.setText(String.valueOf(posData.getAttendees().size()) +
+                                     " / " + posData.getMaxAttendees());
 
         holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
 
