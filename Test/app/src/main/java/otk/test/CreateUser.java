@@ -35,6 +35,16 @@ public class CreateUser extends AppCompatActivity {
         final EditText password = (EditText) findViewById(R.id.password);
         final EditText confirmpassword = (EditText) findViewById(R.id.confirmpassword);
         Button createuser = (Button) findViewById(R.id.createuser);
+        Button cancel = (Button) findViewById(R.id.cancel);
+
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(CreateUser.this,Login.class);
+                startActivity(intent);
+                finish();
+            }
+        });
 
         createuser.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,7 +84,7 @@ public class CreateUser extends AppCompatActivity {
                         case R.id.user_yellow: colorValue = R.color.yellow;
                             break;
                         default:
-                            colorValue = 0xff59a6a6;
+                            colorValue = R.color.appColor;
                     }
                     new CreateUserTask(username.getText().toString(),password.getText().toString(),colorValue).execute("http://findme-env.elasticbeanstalk.com/createuser.php");
                 }
@@ -162,6 +172,7 @@ public class CreateUser extends AppCompatActivity {
                 }
                 Intent intent = new Intent(CreateUser.this, MainActivity.class);
                 startActivity(intent);
+                finish();
             }
             else if(result.equals("401")) {
                 // username already exists

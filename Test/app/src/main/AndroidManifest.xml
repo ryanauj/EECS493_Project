@@ -20,10 +20,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="FindMe"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         <activity
             android:name=".MainActivity"
-            android:label="FindMe">
+            android:label="FindMe" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,17 +49,20 @@
         <activity
             android:name=".Event_Details"
             android:label="Event Details"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         </activity>
-        <activity android:name=".CreateEvent"
+        <activity
+            android:name=".CreateEvent"
             android:label="Create Event"
-            android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+            android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         </activity>
         <activity android:name=".testconnection" >
         </activity>
         <activity android:name=".Login" >
         </activity>
         <activity android:name=".CreateUser" >
+        </activity>
+        <activity android:name=".UserProfile" >
         </activity>
     </application>
 

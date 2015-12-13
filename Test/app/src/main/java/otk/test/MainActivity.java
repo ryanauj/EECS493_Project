@@ -85,11 +85,6 @@ public class MainActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_main);
 
         Log.d("APP STARTED", "HELLO");
-        ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-        ActivityCompat.requestPermissions(MainActivity.this,
-                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
 
         // check for logged in user through
         if (fileExists("userdata") && fileExists("colordata")) {
@@ -130,6 +125,7 @@ public class MainActivity extends AppCompatActivity implements
                 // re-route to login
                 Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
+                finish();
             }
         } else {
             // create userdata file
@@ -230,11 +226,39 @@ public class MainActivity extends AppCompatActivity implements
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.actionlogout: {
+                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In", 0));
+
+                try {
+                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                    fos.write("Not Logged In".getBytes());
+                    fos.close();
+                    FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                    fos2.write("0".getBytes());
+                    fos2.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Intent intent = new Intent(MainActivity.this, Login.class);
+                startActivity(intent);
+                finish();
+                return true;
+            }
+            case R.id.actionprofile: {
+                Intent intent = new Intent(MainActivity.this, UserProfile.class);
+                startActivity(intent);
+                return true;
+            }
+            default: {
+                return false;
+            }
         }
 
-        return super.onOptionsItemSelected(item);
+        //return super.onOptionsItemSelected(item);
     }
 
     @Override
