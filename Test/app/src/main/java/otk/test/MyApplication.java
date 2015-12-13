@@ -37,7 +37,7 @@ public class MyApplication extends Application {
 
     public void addToEventList(EventData add)
     {
-        eventStorage.add(add);
+        eventStorage.add(0,add);
     }
 
     public void clearEventStorage() {

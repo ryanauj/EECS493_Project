@@ -115,6 +115,7 @@ public class CreateEvent extends AppCompatActivity {
                 createEventData.setTime(returnDate);
                 createEventData.setTitle(titleView.getText().toString());
                 createEventData.setColor(((MyApplication) getApplication()).getUser().getColorValue());
+                createEventData.setMaxAttendees(5);
                 ((MyApplication) getApplication()).setTempEvent(createEventData);
 
                 new CreateEventTask(createEventData).execute("http://findme-env.elasticbeanstalk.com/createevent.php");

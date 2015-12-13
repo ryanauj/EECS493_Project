@@ -137,6 +137,13 @@ public class EventData {
 
     public HashSet getAttendees() { return attendees; }
 
+    public int getNumAttendees() {
+        if(attendees==null)
+            return 0;
+        else
+            return attendees.size();
+    }
+
     public LinkedList<ForumPost> getForumList() { return forum_list; }
 
     public String dataToString() {

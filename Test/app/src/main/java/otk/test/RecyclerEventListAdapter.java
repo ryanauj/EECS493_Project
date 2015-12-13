@@ -52,6 +52,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
             this.txtDate = (TextView) v.findViewById(R.id.Time_slot);
             this.txtAttendance = (TextView) v.findViewById(R.id.Attendance);
             this.borderColor = (LinearLayout) v.findViewById(R.id.bordercolor);
+            //this.rsvpCount = (TextView) v.findViewById(R.id.Attendance);
+            //this.txtTime = (TextView) v.findViewById(R.id.Time_slot);
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
         }
@@ -107,6 +109,7 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         EventData posData = this.data.get(position);
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
+
         holder.txtDate.setText(posData.getTime().toString());
 
         String maxAttendees = context.getResources().getString(R.string.infinity);
