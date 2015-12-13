@@ -3,6 +3,7 @@ package otk.test;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,34 +13,36 @@ import java.util.LinkedList;
  */
 public class EventData {
     private MarkerOptions location = new MarkerOptions();
-    private String creator, title, description, nameOfLocation, pictureUrl;
-    private Date time;
+    private String id, creator, title, description, nameOfLocation, pictureUrl;
+    private Calendar time, endTime;
     private int max_attend, color;
     private HashSet attendees;
     private LinkedList<ForumPost> forum_list;
 
     EventData() {
+        this.id = "";
         this.creator = "";
         this.title = "";
         this.description = "";
         this.pictureUrl = "";
         this.location = new MarkerOptions();
         this.location.position(new LatLng(0,0));
-        this.time = new Date();
+        this.time = Calendar.getInstance();
+        this.endTime = Calendar.getInstance();
         this.max_attend = 0;
         this.attendees = new HashSet();
         this.forum_list = new LinkedList<>();
         this.color = 0xffffffff;//Hex for black
     }
 
-    EventData(String creator, String title, String description, String pictureUrl, MarkerOptions location,
-              Date time, int max_attend, int color, HashSet attendees, LinkedList<ForumPost> forum_list) {
+    EventData(String id, String creator, String title, String description, MarkerOptions location, Calendar time, Calendar endTime, int max_attend, int color, HashSet attendees, LinkedList<ForumPost> forum_list) {
+        this.id = id;
         this.creator = creator;
         this.title = title;
         this.description = description;
-        this.pictureUrl = pictureUrl;
         this.location = location;
         this.time = time;
+        this.endTime = endTime;
         this.max_attend = max_attend;
         this.attendees = attendees;
         this.forum_list = forum_list;
@@ -48,11 +51,13 @@ public class EventData {
 
     EventData(EventData replicateEvent)
     {
-        this.creator=replicateEvent.getCreator();
+        this.id = replicateEvent.getId();
+        this.creator = replicateEvent.getCreator();
         this.description = replicateEvent.getDescription();
         this.location = replicateEvent.getLocation();
         this.nameOfLocation = replicateEvent.getNameOfLocation();
         this.time = replicateEvent.getTime();
+        this.endTime = replicateEvent.getEndTime();
         this.title = replicateEvent.getTitle();
         this.location = replicateEvent.getLocation();
         this.color = replicateEvent.getColor();
@@ -60,6 +65,8 @@ public class EventData {
         this.attendees = replicateEvent.getAttendees();
         this.forum_list = replicateEvent.getForumList();
     }
+
+    public void setId(String id) { this.id = id; }
 
     public void setCreator(String creator) {
         this.creator = creator;
@@ -81,9 +88,11 @@ public class EventData {
         this.pictureUrl = pictureUrl;
     }
 
-    public void setTime(Date time) {
+    public void setTime(Calendar time) {
         this.time = time;
     }
+
+    public void setEndTime(Calendar endTime) { this.endTime = endTime; }
 
     public void setTitle(String title) {
         this.title = title;
@@ -97,9 +106,11 @@ public class EventData {
         forum_list.addFirst(new ForumPost(user, message));
     }
 
-    public Date getTime() {
-        return time;
-    }
+    public String getId() { return id; }
+
+    public Calendar getTime() { return time; }
+
+    public Calendar getEndTime() { return endTime; }
 
     public String getTitle() {
         return title;
@@ -136,6 +147,13 @@ public class EventData {
     public int getMaxAttendees() { return max_attend; }
 
     public HashSet getAttendees() { return attendees; }
+
+    public int getNumAttendees() {
+        if(attendees==null)
+            return 0;
+        else
+            return attendees.size();
+    }
 
     public LinkedList<ForumPost> getForumList() { return forum_list; }
 

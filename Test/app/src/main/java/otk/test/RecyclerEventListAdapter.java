@@ -3,13 +3,19 @@ package otk.test;
 import android.content.Context;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by rj on 12/3/15.
@@ -52,6 +58,8 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
             this.txtDate = (TextView) v.findViewById(R.id.Time_slot);
             this.txtAttendance = (TextView) v.findViewById(R.id.Attendance);
             this.borderColor = (LinearLayout) v.findViewById(R.id.bordercolor);
+            //this.rsvpCount = (TextView) v.findViewById(R.id.Attendance);
+            //this.txtTime = (TextView) v.findViewById(R.id.Time_slot);
             v.setOnClickListener(this);
             v.setOnLongClickListener(this);
         }
@@ -107,7 +115,9 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
         EventData posData = this.data.get(position);
         holder.txtCreator.setText(posData.getCreator());
         holder.txtDescription.setText(posData.getTitle());
-        holder.txtDate.setText(posData.getTime().toString());
+
+        Calendar time = posData.getTime();
+        holder.txtDate.setText(getDateString(time)+" "+getTimeString(time));
 
         String maxAttendees = context.getResources().getString(R.string.infinity);
         if (posData.getMaxAttendees() != 0) {
@@ -118,6 +128,30 @@ public class RecyclerEventListAdapter extends RecyclerView.Adapter<RecyclerEvent
 
         if(holder.borderColor!=null)
             holder.borderColor.setBackgroundColor(ContextCompat.getColor(context,posData.getColor()));
+    }
+
+    public String getTimeString(Calendar cal) {
+        Date date = cal.getTime();
+        SimpleDateFormat sdf;
+        if (cal.get(Calendar.HOUR) > 9) {
+            sdf = new SimpleDateFormat("hh:mm aa");
+        }
+        else {
+            sdf = new SimpleDateFormat("h:mm aa");
+        }
+        return sdf.format(date);
+    }
+
+    public String getDateString(Calendar cal) {
+        Date date = cal.getTime();
+        SimpleDateFormat sdf;
+        if (cal.get(Calendar.DAY_OF_MONTH) > 9) {
+            sdf = new SimpleDateFormat("EEEE, MMM dd");
+        }
+        else {
+            sdf = new SimpleDateFormat("EEEE, MMM d");
+        }
+        return sdf.format(date);
     }
 
     // Return the size of your dataset (invoked by the layout manager)

@@ -95,13 +95,13 @@
             android:background="#AAAAAA"></LinearLayout>
 
         <TextView
-            android:id="@+id/event_location"
+            android:id="@+id/event_endtime"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="10dp"
             android:textColor="#222222"
             android:textSize="16dp"
-            android:text="This is the event's location."/>
+            android:text="This is the event's end time."/>
 
         <LinearLayout
             android:layout_width="match_parent"

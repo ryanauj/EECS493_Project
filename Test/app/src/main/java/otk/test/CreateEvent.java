@@ -1,8 +1,10 @@
 package otk.test;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -27,6 +29,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,11 +43,14 @@ import java.util.Date;
 public class CreateEvent extends AppCompatActivity {
 
     public Calendar cal = Calendar.getInstance();
+    public Calendar endCal = (Calendar) cal.clone();
     private LatLng tempLoc;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
+
+        endCal.add(Calendar.HOUR_OF_DAY,1);
 
         final EventData createEventData = ((MyApplication) this.getApplication()).getTempEvent();
         tempLoc = createEventData.getLocation().getPosition();
@@ -68,6 +74,11 @@ public class CreateEvent extends AppCompatActivity {
         TextView dateView = (TextView) findViewById(R.id.date);
         dateView.setText(getDateString(cal));
 
+        TextView timeEndView = (TextView) findViewById(R.id.endTime);
+        timeEndView.setText(getTimeString(endCal));
+        TextView dateEndView = (TextView) findViewById(R.id.endDate);
+        dateEndView.setText(getDateString(endCal));
+
         final LinearLayout mainpage = (LinearLayout) findViewById(R.id.mainpage);
         mainpage.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -84,6 +95,10 @@ public class CreateEvent extends AppCompatActivity {
                 mainpage.requestFocus();
                 hideSoftKeyboard(CreateEvent.this);
                 setTime();
+                if (endCal.before(cal)) {
+                    alert("Cannot set start time before end time");
+                    setTime();
+                }
                 return false;
             }
         });
@@ -98,28 +113,53 @@ public class CreateEvent extends AppCompatActivity {
             }
         });
 
-        Button createEvent = (Button) findViewById(R.id.createevent);
+        timeEndView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mainpage.requestFocus();
+                hideSoftKeyboard(CreateEvent.this);
+                setEndTime();
+                return false;
+            }
+        });
+
+        dateEndView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                mainpage.requestFocus();
+                hideSoftKeyboard(CreateEvent.this);
+                setEndDate();
+                return false;
+            }
+        });
+
+        final Button createEvent = (Button) findViewById(R.id.createevent);
         createEvent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.e("click", "submit clicked");
-                Log.e("title", titleView.getText().toString());
+                //Log.e("click", "submit clicked");
+                //Log.e("title", titleView.getText().toString());
                 //Log.e("creator", creatorView.getText().toString());
-                Log.e("description", descriptionView.getText().toString());
-                //Log.e("location", locationView.getText().toString());
+                //Log.e("description", descriptionView.getText().toString());
+                //Log.e("location", locationView.getText().toString())
 
-                Date returnDate = new Date(cal.getTime().getTime());
-                //createEventData.setCreator(creatorView.getText().toString());
-                createEventData.setCreator((((MyApplication) getApplication()).getUser().getUserName()));
-                createEventData.setDescription(descriptionView.getText().toString());
-                createEventData.setTime(returnDate);
-                createEventData.setTitle(titleView.getText().toString());
-                createEventData.setColor(((MyApplication) getApplication()).getUser().getColorValue());
-                ((MyApplication) getApplication()).setTempEvent(createEventData);
+                if (endCal.before(cal)) {
+                    alert("Cannot set end time/date before start time/date");
+                    endCal = (Calendar) cal.clone();
+                    endCal.add(Calendar.HOUR_OF_DAY,1);
+                }
+                else {
+                    createEventData.setCreator((((MyApplication) getApplication()).getUser().getUserName()));
+                    createEventData.setDescription(descriptionView.getText().toString());
+                    createEventData.setTime(cal);
+                    createEventData.setEndTime(endCal);
+                    createEventData.setTitle(titleView.getText().toString());
+                    createEventData.setColor(((MyApplication) getApplication()).getUser().getColorValue());
+                    createEventData.setMaxAttendees(5);
+                    ((MyApplication) getApplication()).setTempEvent(createEventData);
 
-                new CreateEventTask(createEventData).execute("http://findme-env.elasticbeanstalk.com/createevent.php");
-                //Log.e("time", timeView.getHour()+" "+timeView.getMinute()+timeView.getBaseline());
-                //Log.e("date", dateView.getMonth() + " " + dateView.getDayOfMonth() + " " + dateView.getYear());
+                    new CreateEventTask(createEventData).execute("http://findme-env.elasticbeanstalk.com/createevent.php");
+                }
             }
         });
 
@@ -140,6 +180,26 @@ public class CreateEvent extends AppCompatActivity {
                 mainpage.requestFocus();
                 hideSoftKeyboard(CreateEvent.this);
                 setDate();
+            }
+        });
+
+        final Button setEndTime = (Button) findViewById(R.id.endTimeButton);
+        setEndTime.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainpage.requestFocus();
+                hideSoftKeyboard(CreateEvent.this);
+                setEndTime();
+            }
+        });
+
+        final Button setEndDate = (Button) findViewById(R.id.endDateButton);
+        setEndDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mainpage.requestFocus();
+                hideSoftKeyboard(CreateEvent.this);
+                setEndDate();
             }
         });
 
@@ -169,13 +229,47 @@ public class CreateEvent extends AppCompatActivity {
         new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                cal.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                cal.set(Calendar.MINUTE,minute);
+                cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                cal.set(Calendar.MINUTE, minute);
 
                 TextView timeView = (TextView) findViewById(R.id.time);
                 timeView.setText(getTimeString(cal));
+
+                if (cal.after(endCal) || (!cal.after(endCal) && !cal.before(endCal))) {
+                    endCal = (Calendar) cal.clone();
+
+                    endCal.add(Calendar.HOUR_OF_DAY,1);
+
+                    TextView timeEndView = (TextView) findViewById(R.id.endTime);
+                    timeEndView.setText(getTimeString(endCal));
+
+                    TextView dateEndView = (TextView) findViewById(R.id.endDate);
+                    dateEndView.setText(getDateString(endCal));
+                }
             }
         },cal.get(Calendar.HOUR_OF_DAY),cal.get(Calendar.MINUTE),false).show();
+    }
+
+    public void setEndTime() {
+        new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                Calendar tempcal = (Calendar) endCal.clone();
+                tempcal.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                tempcal.set(Calendar.MINUTE, minute);
+
+                if (tempcal.before(cal)) {
+                    alert("Cannot set end time before start time");
+                }
+                else {
+                    endCal.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                    endCal.set(Calendar.MINUTE,minute);
+
+                    TextView timeEndView = (TextView) findViewById(R.id.endTime);
+                    timeEndView.setText(getTimeString(endCal));
+                }
+            }
+        },endCal.get(Calendar.HOUR_OF_DAY),endCal.get(Calendar.MINUTE),false).show();
     }
 
     public String getTimeString(Calendar cal) {
@@ -190,6 +284,30 @@ public class CreateEvent extends AppCompatActivity {
         return sdf.format(date);
     }
 
+    public void setEndDate() {
+        new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth)  {
+                Calendar tempcal = (Calendar) endCal.clone();
+                tempcal.set(Calendar.YEAR,year);
+                tempcal.set(Calendar.MONTH, monthOfYear);
+                tempcal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                if (tempcal.before(cal)) {
+                    alert("Cannot set end date before start date");
+                }
+                else {
+                    endCal.set(Calendar.YEAR,year);
+                    endCal.set(Calendar.MONTH,monthOfYear);
+                    endCal.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                    TextView dateEndView = (TextView) findViewById(R.id.endDate);
+                    dateEndView.setText(getDateString(endCal));
+                }
+            }
+        },endCal.get(Calendar.YEAR),endCal.get(Calendar.MONTH),endCal.get(Calendar.DAY_OF_MONTH)).show();
+    }
+
     public void setDate() {
         new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -200,6 +318,18 @@ public class CreateEvent extends AppCompatActivity {
 
                 TextView dateView = (TextView) findViewById(R.id.date);
                 dateView.setText(getDateString(cal));
+
+                if (cal.after(endCal) || (!cal.after(endCal) && !cal.before(endCal))) {
+                    endCal = (Calendar) cal.clone();
+
+                    endCal.add(Calendar.HOUR_OF_DAY,1);
+
+                    TextView timeEndView = (TextView) findViewById(R.id.endTime);
+                    timeEndView.setText(getTimeString(endCal));
+
+                    TextView dateEndView = (TextView) findViewById(R.id.endDate);
+                    dateEndView.setText(getDateString(endCal));
+                }
             }
         },cal.get(Calendar.YEAR),cal.get(Calendar.MONTH),cal.get(Calendar.DAY_OF_MONTH)).show();
     }
@@ -225,6 +355,7 @@ public class CreateEvent extends AppCompatActivity {
         // http://findme-env.elasticbeanstalk.com/createevent.php
 
         EventData event = new EventData();
+        int result;
 
         public CreateEventTask(EventData event) {
             this.event = event;
@@ -248,18 +379,22 @@ public class CreateEvent extends AppCompatActivity {
                 JSONObject jsonParam = new JSONObject();
                 jsonParam.put("title", event.getTitle());
                 jsonParam.put("creator", event.getCreator());
+                jsonParam.put("date",event.getTime().getTime().toString());
                 jsonParam.put("description", event.getDescription());
-                jsonParam.put("date", event.getTime());
                 LatLng location = event.getLocation().getPosition();
                 jsonParam.put("lat", Double.toString(location.latitude));
                 jsonParam.put("lng", Double.toString(location.longitude));
-                jsonParam.put("color",Integer.toString(event.getColor()));
+                jsonParam.put("color", Integer.toString(event.getColor()));
+                jsonParam.put("endDate", event.getEndTime().getTime().toString());
+
+                Log.e("json", jsonParam.toString());
 
                 wr.writeBytes(jsonParam.toString());
 
                 wr.flush();
                 wr.close();
 
+                result = conn.getResponseCode();
                 conn.disconnect();
 
             } catch (MalformedURLException e) {
@@ -276,17 +411,37 @@ public class CreateEvent extends AppCompatActivity {
             return true;
         }
 
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                Log.e("PostUpload","Success");
-                Intent intent = new Intent();
-                setResult(RESULT_OK, intent);
-                finish();
+        protected void onPostExecute(Boolean noExceptions) {
+            if (noExceptions) {
+                if (result == 200) {
+                    Log.e("PostUpload","Success");
+                    Intent intent = new Intent();
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+                else if (result == 400) {
+                    Log.e("PostUpload","Failure. Insert failed.");
+                }
+                else {
+                    Log.e("PostUpload","Failure. No json received");
+                }
             }
             else {
-                Log.e("PostUpload","Failure");
+                Log.e("PostUpload","Failure. Exception");
             }
         }
+    }
+
+    public void alert(String message) {
+        new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setMessage(message)
+                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // continue
+                    }
+                })
+                .show();
     }
 
 }

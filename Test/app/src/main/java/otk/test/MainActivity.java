@@ -48,12 +48,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
@@ -460,7 +465,7 @@ public class MainActivity extends AppCompatActivity implements
 
         protected void onPostExecute(JSONArray jsonArray) {
             populateVector(jsonArray);
-            ((MyApplication) getApplicationContext()).logEventList();
+            //((MyApplication) getApplicationContext()).logEventList();
         }
 
         public JSONArray loadJSONArray(String url) {
@@ -471,6 +476,12 @@ public class MainActivity extends AppCompatActivity implements
             // get inputstream from url
             try {
                 URL urlname = new URL(url);
+                HttpURLConnection testconn = (HttpURLConnection) urlname.openConnection();
+                if (testconn.getResponseCode() == 404) {
+                    // no events to get
+                    return null;
+                }
+                testconn.disconnect();
                 URLConnection conn = urlname.openConnection();
                 inputStream = conn.getInputStream();
 
@@ -497,10 +508,12 @@ public class MainActivity extends AppCompatActivity implements
             }
 
             // create jsonArray from string
-            try {
-                jsonArray = new JSONArray(json);
-            } catch (JSONException e) {
-                Log.e("JSONException", e.getMessage());
+            if (json != "") {
+                try {
+                    jsonArray = new JSONArray(json);
+                } catch (JSONException e) {
+                    Log.e("JSONException", e.getMessage());
+                }
             }
 
             return jsonArray;
@@ -509,21 +522,40 @@ public class MainActivity extends AppCompatActivity implements
 
         public void populateVector(JSONArray jsonArray) {
             // parse jsonArray into eventData objects
+            if (jsonArray == null) {
+                return;
+            }
             try{
                 ((MyApplication) getApplicationContext()).clearEventStorage();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
-                    //String id = jsonObject.getString("id");
+                    String id = jsonObject.getString("id");
                     String title = jsonObject.getString("title");
                     String creator = jsonObject.getString("creator");
-                    //String date = jsonObject.getString("date");
+                    String date = jsonObject.getString("date");
                     String description = jsonObject.getString("description");
                     String lat = jsonObject.getString("lat");
                     String lng = jsonObject.getString("lng");
                     String color = jsonObject.getString("color");
+                    String endDate = jsonObject.getString("endDate");
 
                     MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
-                    Date time = new Date();
+                    Calendar time = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+                    try {
+                        time.setTime(sdf.parse(date));// all done
+                    }
+                    catch (ParseException e) {
+                        Log.e("ParseExcept",e.getMessage());
+                    }
+
+                    Calendar endTime = Calendar.getInstance();
+                    try {
+                        endTime.setTime(sdf.parse(endDate));// all done
+                    }
+                    catch (ParseException e) {
+                        Log.e("ParseExcept",e.getMessage());
+                    }
 
                     // Defaults
                     int max_attend = 0; // 0 means no limit on attendance
@@ -531,11 +563,13 @@ public class MainActivity extends AppCompatActivity implements
                     HashSet attendees = new HashSet();
                     LinkedList<ForumPost> forum_list = new LinkedList<>();
 
-                    EventData newEvent = new EventData(creator, title, description, pictureUrl, location, time,
-                                                       max_attend, Integer.valueOf(color), attendees, forum_list);
+                    EventData newEvent = new EventData(id, creator, title, description, location, time, endTime, max_attend, Integer.valueOf(color), attendees, forum_list);
 
                     final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                     mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
+
+
+                    // check for expired events
 
                     ((MyApplication) getApplicationContext()).addToEventList(newEvent);
 

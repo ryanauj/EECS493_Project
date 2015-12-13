@@ -11,6 +11,10 @@ import android.widget.TextView;
 
 import com.google.android.gms.maps.StreetViewPanoramaFragment;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class Event_Details extends AppCompatActivity {
     private String maxAttendees = "";
     private TextView totalAttendees;
@@ -57,8 +61,8 @@ public class Event_Details extends AppCompatActivity {
         TextView title = (TextView) findViewById(R.id.event_title);
         TextView description = (TextView) findViewById(R.id.event_description);
         //ImageView picture = (ImageView) findViewById(R.id.event_picture);
-        TextView location = (TextView) findViewById(R.id.event_location);
         TextView time = (TextView) findViewById(R.id.event_time);
+        TextView endtime = (TextView) findViewById(R.id.event_endtime);
         totalAttendees  = (TextView) findViewById(R.id.total_attendees);
 
         final Button rsvp = (Button) findViewById(R.id.rsvp_button);
@@ -131,7 +135,9 @@ public class Event_Details extends AppCompatActivity {
                 description.setText(sampleData.getDescription());
             // picture.setImage?
             if(time!=null)
-                time.setText(sampleData.getTime().toString());
+                time.setText("Starts at "+getTimeString(sampleData.getTime())+" on "+getDateString(sampleData.getTime()));
+            if(endtime!=null)
+                endtime.setText("Ends at "+getTimeString(sampleData.getEndTime())+" on "+getDateString(sampleData.getEndTime()));
 
             final StreetView svClass = new StreetView();
             final StreetViewPanoramaFragment svFragment = (StreetViewPanoramaFragment) getFragmentManager().findFragmentById(R.id.locStreetView);
@@ -169,5 +175,29 @@ public class Event_Details extends AppCompatActivity {
         }
         else
             finish();
+    }
+
+    public String getTimeString(Calendar cal) {
+        Date date = cal.getTime();
+        SimpleDateFormat sdf;
+        if (cal.get(Calendar.HOUR) > 9) {
+            sdf = new SimpleDateFormat("hh:mm aa");
+        }
+        else {
+            sdf = new SimpleDateFormat("h:mm aa");
+        }
+        return sdf.format(date);
+    }
+
+    public String getDateString(Calendar cal) {
+        Date date = cal.getTime();
+        SimpleDateFormat sdf;
+        if (cal.get(Calendar.DAY_OF_MONTH) > 9) {
+            sdf = new SimpleDateFormat("EEEE, MMM dd");
+        }
+        else {
+            sdf = new SimpleDateFormat("EEEE, MMM d");
+        }
+        return sdf.format(date);
     }
 }
