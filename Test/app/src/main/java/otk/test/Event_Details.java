@@ -89,6 +89,7 @@ public class Event_Details extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 backToDefaultForumConfig();
+                CreateEvent.hideSoftKeyboard(Event_Details.this);
             }
         });
 
@@ -112,6 +113,7 @@ public class Event_Details extends AppCompatActivity {
                 forumListAdapter.notifyDataSetChanged();
                 backToDefaultForumConfig();
                 ((MyApplication) getApplication()).setTempEvent(sampleData);
+                CreateEvent.hideSoftKeyboard(Event_Details.this);
             }
         };
 
