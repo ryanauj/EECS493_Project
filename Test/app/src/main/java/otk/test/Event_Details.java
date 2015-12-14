@@ -127,7 +127,7 @@ public class Event_Details extends AppCompatActivity {
         // set the xml views with EventData
         if(sampleData != null) {
             if(creator!=null)
-                creator.setText(sampleData.getCreator());
+                creator.setText("Hosted by "+sampleData.getCreator());
                 //creator.setText(((MyApplication) getApplication()).getUser().getUserName());
             if(title!=null)
                 title.setText(sampleData.getTitle());

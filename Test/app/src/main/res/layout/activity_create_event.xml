@@ -41,6 +41,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:maxLength="30"
             android:inputType="text|textCapSentences"
             android:hint="Title"
             android:textColor="@color/black"/>
@@ -49,6 +50,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:maxLength="350"
             android:inputType="textLongMessage"
             android:hint="Describe your event..."
             android:maxLines="10"
