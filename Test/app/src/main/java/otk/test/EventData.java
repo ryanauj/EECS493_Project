@@ -102,8 +102,12 @@ public class EventData {
 
     public void addAttendee(String attendee) { this.attendees.add(attendee); }
 
-    public void addMessageToForum(String user, String message) {
-        forum_list.addFirst(new ForumPost(user, message));
+    public void addMessageToForum(String user, String message, Calendar time) {
+        forum_list.addFirst(new ForumPost(user, message, time));
+    }
+
+    public void addMessageToForum(ForumPost forumPost) {
+        forum_list.addFirst(forumPost);
     }
 
     public String getId() { return id; }
@@ -154,6 +158,8 @@ public class EventData {
         else
             return attendees.size();
     }
+
+    public void clearForumList() { forum_list.clear(); }
 
     public LinkedList<ForumPost> getForumList() { return forum_list; }
 

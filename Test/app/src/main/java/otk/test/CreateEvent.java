@@ -145,10 +145,15 @@ public class CreateEvent extends AppCompatActivity {
                 //Log.e("description", descriptionView.getText().toString());
                 //Log.e("location", locationView.getText().toString())
 
+                Calendar currentCal = Calendar.getInstance();
+
                 if (endCal.before(cal)) {
                     alert("Cannot set end time/date before start time/date");
                     endCal = (Calendar) cal.clone();
-                    endCal.add(Calendar.HOUR_OF_DAY,1);
+                    endCal.add(Calendar.HOUR_OF_DAY, 1);
+                }
+                else if (cal.before(currentCal) || endCal.before(currentCal)) {
+                    alert("Cannot create event in the past");
                 }
                 else {
                     createEventData.setCreator((((MyApplication) getApplication()).getUser().getUserName()));

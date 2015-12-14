@@ -1,5 +1,6 @@
 package otk.test;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -7,15 +8,15 @@ import java.util.Date;
  */
 public class ForumPost {
     private String user, message;
-    private Date date;
+    private Calendar time;
 
-    public ForumPost(String user, String message) {
+    public ForumPost(String user, String message, Calendar time) {
         this.user = user;
         this.message = message;
-        this.date = new Date();
+        this.time = (Calendar) time.clone();
     }
 
     public String getUser() { return user; }
     public String getMessage() { return message; }
-    public Date getDate() { return date; }
+    public Calendar getTime() { return time; }
 }
