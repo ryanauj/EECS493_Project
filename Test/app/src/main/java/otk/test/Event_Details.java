@@ -2,6 +2,7 @@ package otk.test;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,7 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.google.android.gms.maps.StreetViewPanoramaFragment;
+import com.google.android.gms.maps.StreetViewPanoramaView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -39,6 +40,8 @@ public class Event_Details extends AppCompatActivity {
     private ScrollView scrollView;
     private LinearLayout main_linear_layout;
     private LinearLayout map_linear_layout;
+
+    StreetViewPanoramaView streetViewPanoramaView;
 
     private void disableButton(Button button) {
         button.setEnabled(false);
@@ -83,8 +86,8 @@ public class Event_Details extends AppCompatActivity {
         TextView time = (TextView) findViewById(R.id.event_time);
         TextView endtime = (TextView) findViewById(R.id.event_endtime);
         totalAttendees  = (TextView) findViewById(R.id.total_attendees);
-        View locStreetView = findViewById(R.id.locStreetView);
-
+        //View locStreetView = findViewById(R.id.locStreetView);
+        streetViewPanoramaView = (StreetViewPanoramaView) findViewById(R.id.street_view_panorama);
 
         main_linear_layout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -177,9 +180,6 @@ public class Event_Details extends AppCompatActivity {
 
         addPost.setOnClickListener(addPostClicked);
 
-//        sampleData.addMessageToForum(new ForumPost("Person", "Message 1!"));
-//        sampleData.addMessageToForum(new ForumPost("Stan Barathean", "Message 2!"));
-
         // set the xml views with EventData
         if(sampleData != null) {
             if(creator!=null)
@@ -195,16 +195,26 @@ public class Event_Details extends AppCompatActivity {
             if(endtime!=null)
                 endtime.setText("Ends at "+getTimeString(sampleData.getEndTime())+" on "+getDateString(sampleData.getEndTime()));
 
-            final StreetView svClass = new StreetView();
-            final StreetViewPanoramaFragment svFragment = (StreetViewPanoramaFragment) getFragmentManager().findFragmentById(R.id.locStreetView);
-            if(svFragment!=null) {
+//            final StreetView svClass = new StreetView();
+//            final StreetViewPanoramaFragment svFragment = (StreetViewPanoramaFragment) getFragmentManager().findFragmentById(R.id.locStreetView);
+//            if(svFragment!=null) {
+//                Log.e("Street View:","Loaded Fragment");
+//                //svFragment.getStreetViewPanoramaAsync(svClass);
+//                svFragment.getStreetViewPanorama().setUserNavigationEnabled(false);
+//                svFragment.getStreetViewPanorama().setPanningGesturesEnabled(true);
+//                svFragment.getStreetViewPanorama().setZoomGesturesEnabled(false);
+//                svFragment.getStreetViewPanorama().setStreetNamesEnabled(false);
+//                svFragment.getStreetViewPanorama().setPosition(sampleData.getLocation().getPosition(),30);
+//            }
+
+            if(streetViewPanoramaView!=null) {
                 Log.e("Street View:","Loaded Fragment");
                 //svFragment.getStreetViewPanoramaAsync(svClass);
-                svFragment.getStreetViewPanorama().setUserNavigationEnabled(false);
-                svFragment.getStreetViewPanorama().setPanningGesturesEnabled(true);
-                svFragment.getStreetViewPanorama().setZoomGesturesEnabled(false);
-                svFragment.getStreetViewPanorama().setStreetNamesEnabled(false);
-                svFragment.getStreetViewPanorama().setPosition(sampleData.getLocation().getPosition(),30);
+                streetViewPanoramaView.getStreetViewPanorama().setUserNavigationEnabled(false);
+                streetViewPanoramaView.getStreetViewPanorama().setPanningGesturesEnabled(true);
+                streetViewPanoramaView.getStreetViewPanorama().setZoomGesturesEnabled(false);
+                streetViewPanoramaView.getStreetViewPanorama().setStreetNamesEnabled(false);
+                streetViewPanoramaView.getStreetViewPanorama().setPosition(sampleData.getLocation().getPosition(),30);
             }
 
 
@@ -231,6 +241,28 @@ public class Event_Details extends AppCompatActivity {
         }
         else
             finish();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+
+        Rect rect = new Rect(0, 0, streetViewPanoramaView.getWidth(), streetViewPanoramaView.getHeight());
+
+        if (streetViewPanoramaView != null) {
+            streetViewPanoramaView.getGlobalVisibleRect(rect);
+
+            if (rect.contains((int) event.getRawX(), (int) event.getRawY())) {
+                event.offsetLocation(-rect.left, -rect.top);
+                streetViewPanoramaView.dispatchTouchEvent(event);
+                return true;
+
+            } else {
+                //Continue with touch event
+                return super.dispatchTouchEvent(event);
+            }
+        } else {
+            return super.dispatchTouchEvent(event);
+        }
     }
 
     public String getTimeString(Calendar cal) {

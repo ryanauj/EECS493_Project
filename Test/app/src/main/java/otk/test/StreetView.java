@@ -24,7 +24,8 @@ public class StreetView extends FragmentActivity implements OnStreetViewPanorama
         super.onCreate(savedInstanceState);
         StreetViewPanoramaFragment streetViewPanoramaFragment =
                 (StreetViewPanoramaFragment) getFragmentManager()
-                        .findFragmentById(R.id.locStreetView);
+                         .findFragmentById(R.id.street_view_panorama);
+        //                .findFragmentById(R.id.locStreetView);
         streetViewPanoramaFragment.getStreetViewPanoramaAsync(this);
     }
     @Override
