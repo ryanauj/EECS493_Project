@@ -58,12 +58,18 @@
             android:layout_height="200dp"
             android:orientation="horizontal"
             android:layout_gravity="center">
-            <fragment
-                android:id="@+id/locStreetView"
+
+            <com.google.android.gms.maps.StreetViewPanoramaView
+                android:id="@+id/street_view_panorama"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:name="com.google.android.gms.maps.StreetViewPanoramaFragment"
-                />
+                android:layout_height="match_parent"/>
+
+            <!--<fragment-->
+                <!--android:id="@+id/locStreetView"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="match_parent"-->
+                <!--android:name="com.google.android.gms.maps.StreetViewPanoramaFragment"-->
+                <!--/>-->
         </LinearLayout>
 
         <LinearLayout
