@@ -2,6 +2,7 @@ package otk.test;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -14,13 +15,35 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.StreetViewPanoramaFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Locale;
 
 public class Event_Details extends AppCompatActivity {
+    private EventData sampleData;
     private String maxAttendees = "";
     private TextView totalAttendees;
 
@@ -67,7 +90,7 @@ public class Event_Details extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_details);
 
-        final EventData sampleData = new EventData(((MyApplication) this.getApplication()).getTempEvent());
+        sampleData = new EventData(((MyApplication) this.getApplication()).getTempEvent());
 
         final String loggedInUser = (((MyApplication) getApplication()).getUser().getUserName());
 
@@ -167,7 +190,14 @@ public class Event_Details extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 hideSoftKeyboard(addPost);
-                sampleData.addMessageToForum(loggedInUser, editPost.getText().toString());
+
+                ForumPost newForumPost = new ForumPost(loggedInUser, editPost.getText().toString(), Calendar.getInstance());
+
+                sampleData.addMessageToForum(newForumPost);
+
+                // create new chat message on database
+                new CreateChatMessageTask(sampleData, newForumPost).execute("http://findme-env.elasticbeanstalk.com/createchatmessage.php");
+
                 forumListAdapter.notifyDataSetChanged();
                 backToDefaultForumConfig();
                 ((MyApplication) getApplication()).setTempEvent(sampleData);
@@ -214,7 +244,7 @@ public class Event_Details extends AppCompatActivity {
 
             if (totalAttendees != null) {
                 totalAttendees.setText(String.valueOf(sampleData.getAttendees().size()) +
-                                       " / " + maxAttendees);
+                        " / " + maxAttendees);
             }
 
             Log.e("Logged in user", loggedInUser);
@@ -228,6 +258,7 @@ public class Event_Details extends AppCompatActivity {
                     ) {
                 disableButton(rsvp);
             }
+            new SelectChatMessagesTask(sampleData).execute("http://findme-env.elasticbeanstalk.com/selectchatmessages.php");
         }
         else
             finish();
@@ -255,5 +286,207 @@ public class Event_Details extends AppCompatActivity {
             sdf = new SimpleDateFormat("EEEE, MMM d");
         }
         return sdf.format(date);
+    }
+
+    public class CreateChatMessageTask extends AsyncTask<String, Void, Boolean> {
+        // http://findme-env.elasticbeanstalk.com/deleteevent.php
+
+        EventData event;
+        ForumPost forumPost;
+        int result;
+
+        public CreateChatMessageTask(EventData event, ForumPost forumPost) {
+            this.event = event;
+            this.forumPost = forumPost;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... url) {
+            try {
+                URL urlname = new URL(url[0]);
+                HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("POST");
+                //conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+                //conn.setRequestProperty("charset", "utf-8");
+                //conn.setRequestProperty("Content-Length", "" + Integer.toString(urlParameters.getBytes().length));
+                //conn.setUseCaches(false);
+                conn.setChunkedStreamingMode(0);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("eventid",event.getId());
+                jsonParam.put("username",forumPost.getUser());
+                jsonParam.put("date", forumPost.getTime().getTime().toString());
+                jsonParam.put("message",forumPost.getMessage());
+
+                wr.writeBytes(jsonParam.toString());
+
+                wr.flush();
+                wr.close();
+
+                result = conn.getResponseCode();
+
+                conn.disconnect();
+
+            } catch (MalformedURLException e) {
+                Log.e("MalformedURL", e.getMessage());
+                return false;
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+                return false;
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+                return false;
+            }
+
+            return true;
+        }
+
+        protected void onPostExecute(Boolean noException) {
+            if (noException) {
+                if (result == 200) {
+                    Log.e("createmessage","Success");
+                }
+                else if (result == 404) {
+                    Log.e("createmessage","Failure, insert failed");
+                }
+                else {
+                    Log.e("createmessage","Failure, unknown error");
+                }
+            }
+            else {
+                Log.e("createmessage","Failure, exception");
+            }
+        }
+    }
+
+    public class SelectChatMessagesTask extends AsyncTask<String, Void, JSONArray> {
+        // http://findme-env.elasticbeanstalk.com/selectallevents.php
+
+        EventData event;
+
+        public SelectChatMessagesTask(EventData event) {
+            this.event = event;
+        }
+
+        @Override
+        protected JSONArray doInBackground(String... url) {
+            return loadJSONArray(url[0]);
+        }
+
+        protected void onPostExecute(JSONArray jsonArray) {
+            populateList(jsonArray);
+            //((MyApplication) getApplicationContext()).logEventList();
+        }
+
+        public JSONArray loadJSONArray(String url) {
+            InputStream inputStream = null;
+            JSONArray jsonArray = null;
+            String json = "";
+
+            // get inputstream from url
+            try {
+                URL urlname = new URL(url);
+                HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("POST");
+                conn.setChunkedStreamingMode(0);
+
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("eventid", event.getId());
+                Log.e("eventid",event.getId());
+
+                wr.writeBytes(jsonParam.toString());
+
+                wr.flush();
+                wr.close();
+
+                Log.e("code",conn.getResponseCode()+"");
+
+                if (conn.getResponseCode() == 404) {
+                    // no messages to get
+                    return null;
+                }
+                inputStream = conn.getInputStream();
+
+                conn.disconnect();
+
+            } catch (MalformedURLException e) {
+                Log.e("MalformedURLException", e.getMessage());
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            } catch (JSONException e) {
+                Log.e("JSONExcept", e.getMessage());
+            }
+
+
+            // read content into string
+            try {
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "utf-8"), 8);
+                StringBuilder stringBuilder = new StringBuilder();
+                String line = null;
+                while ((line = bufferedReader.readLine()) != null) {
+                    stringBuilder.append(line + "\n");
+                }
+                inputStream.close();
+                json = stringBuilder.toString();
+            } catch (UnsupportedEncodingException e) {
+                Log.e("UnsupportedEncoding", e.getMessage());
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+            }
+
+            // create jsonArray from string
+            if (json != "") {
+                try {
+                    jsonArray = new JSONArray(json);
+                } catch (JSONException e) {
+                    Log.e("JSONException", e.getMessage());
+                }
+            }
+
+            return jsonArray;
+        }
+
+
+        public void populateList(JSONArray jsonArray) {
+            // parse jsonArray into eventData objects
+            if (jsonArray == null) {
+                return;
+            }
+            try{
+                event.clearForumList();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String username = jsonObject.getString("username");
+                    String date = jsonObject.getString("date");
+                    String message = jsonObject.getString("message");
+
+                    Calendar time = Calendar.getInstance();
+                    SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
+                    try {
+                        time.setTime(sdf.parse(date));// all done
+                    }
+                    catch (ParseException e) {
+                        Log.e("ParseExcept",e.getMessage());
+                    }
+
+                    ForumPost forumPost = new ForumPost(username,message,time);
+                    event.addMessageToForum(forumPost);
+                }
+
+                forumListAdapter.notifyDataSetChanged();
+                backToDefaultForumConfig();
+                ((MyApplication) getApplication()).setTempEvent(event);
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+            }
+        }
+
     }
 }

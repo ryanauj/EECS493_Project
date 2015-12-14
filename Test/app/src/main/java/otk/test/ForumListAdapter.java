@@ -45,7 +45,7 @@ public class ForumListAdapter extends ArrayAdapter<ForumPost> {
             if (post_user != null) { post_user.setText(forumPost.getUser()); }
             if (post_message != null) { post_message.setText(forumPost.getMessage()); }
             if (post_date != null) {
-                post_date.setText(DateFormat.getDateTimeInstance().format(forumPost.getDate()));
+                post_date.setText(DateFormat.getDateTimeInstance().format(forumPost.getTime().getTime()));
             }
         }
         return row;

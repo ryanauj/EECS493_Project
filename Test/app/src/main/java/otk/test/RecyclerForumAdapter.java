@@ -57,7 +57,7 @@ public class RecyclerForumAdapter extends RecyclerView.Adapter<RecyclerForumAdap
         ForumPost posData = this.data.get(position);
         holder.post_user.setText(posData.getUser());
         holder.post_message.setText(posData.getMessage());
-        holder.post_date.setText(DateFormat.getDateTimeInstance().format(posData.getDate()));
+        holder.post_date.setText(DateFormat.getDateTimeInstance().format(posData.getTime().getTime()));
     }
 
     // Return the size of your dataset (invoked by the layout manager)
