@@ -112,6 +112,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    public LatLng returnMyLoc() {
+        /*
+        try {
+            Location location = mLocationManager.getLastKnownLocation(LocProvider);
+
+            return new LatLng(location.getLatitude(),location.getLongitude());
+        }
+        catch (SecurityException e) {
+            Log.e("Security",e.getMessage());
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
+
+            ActivityCompat.requestPermissions(MapsActivity.this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+        }
+        */
+        return new LatLng(prevLocation.getLatitude(),prevLocation.getLongitude());
+    }
+
 
     public boolean updateLastLoc(Location newLoc)
     {

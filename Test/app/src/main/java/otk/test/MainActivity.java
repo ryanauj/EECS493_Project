@@ -37,6 +37,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -164,7 +165,6 @@ public class MainActivity extends AppCompatActivity implements
                 Intent createEventIntent = new Intent(MainActivity.this, CreateEvent.class);
                 startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
 
-                new SelectAllEventsTask().execute("http://findme-env.elasticbeanstalk.com/selectallevents.php");
                 // display all events
             }
         });
@@ -253,6 +253,13 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.actionprofile: {
                 Intent intent = new Intent(MainActivity.this, UserProfile.class);
                 startActivity(intent);
+                return true;
+            }
+            case R.id.actioncreateevent: {
+                ((MyApplication) getApplication()).setTempEvent(new EventData());
+                ((MyApplication) getApplication()).getTempEvent().setLocation(mapClass.returnMyLoc());
+                Intent createEventIntent = new Intent(MainActivity.this, CreateEvent.class);
+                startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
                 return true;
             }
             default: {
@@ -524,6 +531,7 @@ public class MainActivity extends AppCompatActivity implements
             }
             try{
                 ((MyApplication) getApplicationContext()).clearEventStorage();
+                final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject jsonObject = jsonArray.getJSONObject(i);
                     String id = jsonObject.getString("id");
@@ -562,13 +570,16 @@ public class MainActivity extends AppCompatActivity implements
 
                     EventData newEvent = new EventData(id, creator, title, description, location, time, endTime, max_attend, Integer.valueOf(color), attendees, forum_list);
 
-                    final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
-                    mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
-
-
                     // check for expired events
-
-                    ((MyApplication) getApplicationContext()).addToEventList(newEvent);
+                    Calendar currenttime = Calendar.getInstance();
+                    if (currenttime.after(newEvent.getEndTime())) {
+                        // delete event
+                        new DeleteEventTask(newEvent.getId()).execute("http://findme-env.elasticbeanstalk.com/deleteevent.php");
+                    }
+                    else {
+                        mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
+                        ((MyApplication) getApplicationContext()).addToEventList(newEvent);
+                    }
 
                 }
                 // done loading all events
@@ -580,6 +591,75 @@ public class MainActivity extends AppCompatActivity implements
             }
         }
 
+    }
+
+    public class DeleteEventTask extends AsyncTask<String, Void, Boolean> {
+        // http://findme-env.elasticbeanstalk.com/deleteevent.php
+
+        int result;
+        String id = "";
+
+        public DeleteEventTask(String id) {
+            this.id = id;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... url) {
+            try {
+                URL urlname = new URL(url[0]);
+                HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
+                conn.setDoOutput(true);
+                conn.setInstanceFollowRedirects(false);
+                conn.setRequestMethod("POST");
+                conn.setChunkedStreamingMode(0);
+                DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
+
+                JSONObject jsonParam = new JSONObject();
+                jsonParam.put("id", id);
+
+                Log.e("json", jsonParam.toString());
+
+                wr.writeBytes(jsonParam.toString());
+
+                wr.flush();
+                wr.close();
+
+                result = conn.getResponseCode();
+                Log.e("code",result+"");
+                conn.disconnect();
+
+            } catch (MalformedURLException e) {
+                Log.e("MalformedURL", e.getMessage());
+                return false;
+            } catch (IOException e) {
+                Log.e("IOException", e.getMessage());
+                return false;
+            } catch (JSONException e) {
+                Log.e("JSONException", e.getMessage());
+                return false;
+            }
+
+            return true;
+        }
+
+        protected void onPostExecute(Boolean noException) {
+            if (noException) {
+                if (result == 200) {
+                    Log.e("DeleteEvent","Success");
+
+                }
+                else if (result == 400) {
+                    Log.e("DeleteEvent","Failure no deletion");
+
+                }
+                else {
+                    Log.e("DeleteEvent","Failure unknown error");
+                }
+            }
+            else {
+                Log.e("DeleteEvent","Failure");
+            }
+        }
     }
 
 }
