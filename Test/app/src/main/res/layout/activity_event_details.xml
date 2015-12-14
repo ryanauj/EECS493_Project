@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/event_details_scrollview"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="otk.test.Event_Details"
@@ -21,6 +22,7 @@
     <!-- set up layout and let Java fill in the details by ID -->
 
     <LinearLayout
+        android:id="@+id/event_details_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -51,6 +53,7 @@
             android:text="This is the event's creator."/>
 
         <LinearLayout
+            android:id="@+id/map_linear_layout"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:orientation="horizontal"
@@ -141,7 +144,8 @@
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:paddingTop="10dp">
 s
             <Button
                 android:id="@+id/cancel_post"
@@ -152,7 +156,7 @@ s
                 android:gravity="center"
                 android:padding="10dp"
                 android:text="Cancel"
-                android:background="#d42929"
+                android:background="#C62626"
                 android:visibility="invisible"
                 android:enabled="false"/>
 
@@ -183,7 +187,8 @@ s
             android:id="@+id/edit_post_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone"/>
+            android:visibility="gone"
+            android:inputType="textLongMessage"/>
 
         <otk.test.ExpandableHeightListView
             android:id="@+id/forum_list_view"

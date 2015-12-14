@@ -1,12 +1,17 @@
 package otk.test;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.StreetViewPanoramaFragment;
@@ -31,15 +36,27 @@ public class Event_Details extends AppCompatActivity {
     private EditText editPost;
     private Button cancelButton, addPost;
 
+    private ScrollView scrollView;
+    private LinearLayout main_linear_layout;
+    private LinearLayout map_linear_layout;
+
     private void disableButton(Button button) {
         button.setEnabled(false);
         button.setBackgroundColor(Color.LTGRAY);
+    }
+
+    private void hideSoftKeyboard(View view) {
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void backToDefaultForumConfig() {
         addPost.setText("Add Post");
         addPost.setBackgroundResource(android.R.drawable.btn_default);
         editPost.setVisibility(View.GONE);
+        editPost.setText("");
         cancelButton.setEnabled(false);
         cancelButton.setVisibility(View.INVISIBLE);
         addPost.setOnClickListener(addPostClicked);
@@ -57,6 +74,8 @@ public class Event_Details extends AppCompatActivity {
         maxAttendees = getResources().getString(R.string.infinity);
 
         // find the xml views by id
+        scrollView = (ScrollView) findViewById(R.id.event_details_scrollview);
+        main_linear_layout = (LinearLayout) findViewById(R.id.event_details_layout);
         TextView creator = (TextView) findViewById(R.id.event_creator);
         TextView title = (TextView) findViewById(R.id.event_title);
         TextView description = (TextView) findViewById(R.id.event_description);
@@ -64,6 +83,30 @@ public class Event_Details extends AppCompatActivity {
         TextView time = (TextView) findViewById(R.id.event_time);
         TextView endtime = (TextView) findViewById(R.id.event_endtime);
         totalAttendees  = (TextView) findViewById(R.id.total_attendees);
+        View locStreetView = findViewById(R.id.locStreetView);
+
+
+        main_linear_layout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                hideSoftKeyboard(main_linear_layout);
+                return false;
+            }
+        });
+
+//        locStreetView.setOnTouchListener(new View.OnTouchListener() {
+//            // Setting on Touch Listener for handling the touch inside ScrollView
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event) {
+//                // Disallow the touch request for scrollview on touch of child view
+//                v.getParent().requestDisallowInterceptTouchEvent(true);
+//                scrollView.requestDisallowInterceptTouchEvent(true);
+//                Log.e("Map touched", "requested disallow interceptTouchEvents from parent layouts");
+//                return false;
+//            }
+//        });
+
+//        locStreetView.setFocusableInTouchMode(true);
 
         final Button rsvp = (Button) findViewById(R.id.rsvp_button);
         rsvp.setOnClickListener(new View.OnClickListener() {
@@ -73,7 +116,7 @@ public class Event_Details extends AppCompatActivity {
                 disableButton(rsvp);
 
                 totalAttendees.setText(String.valueOf(sampleData.getAttendees().size()) +
-                                        " / " + maxAttendees);
+                        " / " + maxAttendees);
                 ((MyApplication) getApplication()).setTempEvent(sampleData);
             }
         });
@@ -86,6 +129,15 @@ public class Event_Details extends AppCompatActivity {
 
 
         editPost = (EditText) findViewById(R.id.edit_post_text);
+        editPost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(editPost, InputMethodManager.SHOW_FORCED);
+                }
+            }
+        });
+
         cancelButton = (Button) findViewById(R.id.cancel_post);
         addPost = (Button) findViewById(R.id.add_post_button);
 
@@ -93,6 +145,8 @@ public class Event_Details extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 backToDefaultForumConfig();
+                hideSoftKeyboard(cancelButton);
+                forumList.requestFocus();
             }
         });
 
@@ -100,22 +154,24 @@ public class Event_Details extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addPost.setText("Post");
-                addPost.setBackgroundColor(Color.rgb(96, 168, 58));
+                addPost.setBackgroundColor(Color.rgb(0, 173, 111));
                 editPost.setVisibility(View.VISIBLE);
+                editPost.requestFocus();
                 cancelButton.setVisibility(View.VISIBLE);
                 cancelButton.setEnabled(true);
                 addPost.setOnClickListener(addPostNotClicked);
-                CreateEvent.hideSoftKeyboard(Event_Details.this);
             }
         };
 
         addPostNotClicked = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                hideSoftKeyboard(addPost);
                 sampleData.addMessageToForum(loggedInUser, editPost.getText().toString());
                 forumListAdapter.notifyDataSetChanged();
                 backToDefaultForumConfig();
                 ((MyApplication) getApplication()).setTempEvent(sampleData);
+                forumList.requestFocus();
             }
         };
 
@@ -148,7 +204,7 @@ public class Event_Details extends AppCompatActivity {
                 svFragment.getStreetViewPanorama().setPanningGesturesEnabled(true);
                 svFragment.getStreetViewPanorama().setZoomGesturesEnabled(false);
                 svFragment.getStreetViewPanorama().setStreetNamesEnabled(false);
-                svFragment.getStreetViewPanorama().setPosition(sampleData.getLocation().getPosition(),10);
+                svFragment.getStreetViewPanorama().setPosition(sampleData.getLocation().getPosition(),30);
             }
 
 
