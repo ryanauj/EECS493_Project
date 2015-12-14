@@ -113,21 +113,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public LatLng returnMyLoc() {
-        /*
-        try {
-            Location location = mLocationManager.getLastKnownLocation(LocProvider);
+        if (prevLocation == null) {
+            Location location = null;
+            try {
+                location = mLocationManager.getLastKnownLocation(LocProvider);
+            }
+            catch (SecurityException e) {
+                Log.e("Security",e.getMessage());
+                ActivityCompat.requestPermissions(MapsActivity.this,
+                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
 
-            return new LatLng(location.getLatitude(),location.getLongitude());
+                ActivityCompat.requestPermissions(MapsActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+            }
+            if (location != null) {
+                return new LatLng(location.getLatitude(),location.getLongitude());
+            }
+            return new LatLng(40,40);
         }
-        catch (SecurityException e) {
-            Log.e("Security",e.getMessage());
-            ActivityCompat.requestPermissions(MapsActivity.this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-            ActivityCompat.requestPermissions(MapsActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
-        }
-        */
         return new LatLng(prevLocation.getLatitude(),prevLocation.getLongitude());
     }
 

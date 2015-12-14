@@ -52,7 +52,9 @@ public class CreateEvent extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_event);
 
+        cal.add(Calendar.MINUTE, 5);
         endCal.add(Calendar.HOUR_OF_DAY,1);
+        endCal.add(Calendar.MINUTE,5);
 
         final EventData createEventData = ((MyApplication) this.getApplication()).getTempEvent();
         tempLoc = createEventData.getLocation().getPosition();

@@ -7,12 +7,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -29,6 +31,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -255,11 +259,9 @@ public class MainActivity extends AppCompatActivity implements
                 startActivity(intent);
                 return true;
             }
-            case R.id.actioncreateevent: {
-                ((MyApplication) getApplication()).setTempEvent(new EventData());
-                ((MyApplication) getApplication()).getTempEvent().setLocation(mapClass.returnMyLoc());
-                Intent createEventIntent = new Intent(MainActivity.this, CreateEvent.class);
-                startActivityForResult(createEventIntent, CREATE_EVENT_REQUEST);
+            case R.id.actionhelp: {
+                Intent intent = new Intent(MainActivity.this, Help.class);
+                startActivity(intent);
                 return true;
             }
             default: {
@@ -376,11 +378,15 @@ public class MainActivity extends AppCompatActivity implements
             if (resultCode == RESULT_OK) {
                 EventData newEvent = new EventData(((MyApplication) this.getApplication()).getTempEvent());
                 final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
-                mapFragment.getMap().addMarker(newEvent.getLocation().title(newEvent.getTitle()));
+
                 newEvent.setColor(((MyApplication) getApplication()).getUser().getColorValue());
                 Log.e("color", ((MyApplication) getApplication()).getUser().getColorValue() + "");
                 ((MyApplication) getApplication()).addToEventList(newEvent);
+
+                float color = getMarkerColor(newEvent.getColor());
+                MarkerOptions location = new MarkerOptions().title(newEvent.getTitle()).position(newEvent.getLocation().getPosition()).icon(BitmapDescriptorFactory.defaultMarker(color));
                 recyclerViewAdapter.notifyDataSetChanged();
+                mapFragment.getMap().addMarker(location);
                 //mMap.addMarker(new MarkerOptions().position(point).title("Point new"));
             }
         }
@@ -541,10 +547,12 @@ public class MainActivity extends AppCompatActivity implements
                     String description = jsonObject.getString("description");
                     String lat = jsonObject.getString("lat");
                     String lng = jsonObject.getString("lng");
-                    String color = jsonObject.getString("color");
+                    String colorvalue = jsonObject.getString("color");
                     String endDate = jsonObject.getString("endDate");
 
-                    MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng)));
+                    float color = getMarkerColor(Integer.parseInt(colorvalue));
+
+                    MarkerOptions location = new MarkerOptions().title(title).position(new LatLng(Double.parseDouble(lat), Double.parseDouble(lng))).icon(BitmapDescriptorFactory.defaultMarker(color));
                     Calendar time = Calendar.getInstance();
                     SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.US);
                     try {
@@ -568,7 +576,7 @@ public class MainActivity extends AppCompatActivity implements
                     HashSet attendees = new HashSet();
                     LinkedList<ForumPost> forum_list = new LinkedList<>();
 
-                    EventData newEvent = new EventData(id, creator, title, description, location, time, endTime, max_attend, Integer.valueOf(color), attendees, forum_list);
+                    EventData newEvent = new EventData(id, creator, title, description, location, time, endTime, max_attend, Integer.valueOf(colorvalue), attendees, forum_list);
 
                     // check for expired events
                     Calendar currenttime = Calendar.getInstance();
@@ -660,6 +668,15 @@ public class MainActivity extends AppCompatActivity implements
                 Log.e("DeleteEvent","Failure");
             }
         }
+    }
+
+    public float getMarkerColor(int resourceid) {
+        int color = ContextCompat.getColor(this, resourceid);
+        float[] newcolor = {0,0,0};
+        Color c = new Color();
+        c.colorToHSV(color,newcolor);
+
+        return newcolor[0];
     }
 
 }

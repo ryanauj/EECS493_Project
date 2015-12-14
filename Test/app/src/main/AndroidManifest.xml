@@ -64,6 +64,8 @@
         </activity>
         <activity android:name=".UserProfile" >
         </activity>
+        <activity android:name=".Help" >
+        </activity>
     </application>
 
 </manifest>

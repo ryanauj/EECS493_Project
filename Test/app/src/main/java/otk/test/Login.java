@@ -203,7 +203,7 @@ public class Login extends AppCompatActivity {
             }
             else {
                 // unknown error
-                alert("ERROR: "+result);
+                alert("Please fill in your username and password");
             }
         }
     }
