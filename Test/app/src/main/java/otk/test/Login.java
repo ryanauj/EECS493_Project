@@ -70,7 +70,7 @@ public class Login extends AppCompatActivity {
                         fos.write("Not Logged In".getBytes());
                         fos.close();
                         FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
-                        fos2.write("0".getBytes());
+                        fos2.write((R.color.black+"").getBytes());
                         fos2.close();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();

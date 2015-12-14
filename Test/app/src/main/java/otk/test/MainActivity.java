@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements
         // check for logged in user through
         if (fileExists("userdata") && fileExists("colordata")) {
             String username = null;
-            int color = -40;
+            int color = 0;
             try {
                 FileInputStream fis = openFileInput("userdata");
                 byte[] input = new byte[fis.available()];
@@ -125,27 +125,29 @@ public class MainActivity extends AppCompatActivity implements
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (username != null && !username.equals("Not Logged In") && color != -40) {
+            if (username != null && !username.equals("Not Logged In") && color != 0) {
                 ((MyApplication) getApplication()).setUser(new UserData(username, color));
             } else {
                 // re-route to login
+                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",0));
                 Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
                 finish();
             }
         } else {
-            // create userdata file
+            // create files
             try {
                 FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                 fos.write("Not Logged In".getBytes());
                 fos.close();
                 FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
-                fos2.write("0".getBytes());
+                fos2.write((R.color.black+"").getBytes());
                 fos2.close();
 
                 // re-route to login
                 Intent intent = new Intent(MainActivity.this, Login.class);
                 startActivity(intent);
+                finish();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -670,6 +672,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     public float getMarkerColor(int resourceid) {
+        if (resourceid == 0) {
+            resourceid = R.color.black;
+        }
         int color = ContextCompat.getColor(this, resourceid);
         float[] newcolor = {0,0,0};
         Color c = new Color();
