@@ -48,7 +48,15 @@ public class Login extends AppCompatActivity {
                 EditText username = (EditText) findViewById(R.id.username);
                 EditText password = (EditText) findViewById(R.id.password);
 
-                new UserLoginTask(username.getText().toString(), password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
+                if (username.getText().toString().isEmpty()) {
+                    alert("Please type your username");
+                }
+                else if (password.getText().toString().isEmpty()) {
+                    alert("Please type your password");
+                }
+                else {
+                    new UserLoginTask(username.getText().toString(), password.getText().toString()).execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
+                }
 
                 //UserLoginTask login = new UserLoginTask(getApplicationContext(),username.getText().toString(),password.getText().toString());
                 //login.execute("http://findme-env.elasticbeanstalk.com/userlogin.php");
@@ -63,14 +71,16 @@ public class Login extends AppCompatActivity {
             logout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",0));
+                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",R.color.black));
 
                     try {
                         FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                         fos.write("Not Logged In".getBytes());
+                        fos.flush();
                         fos.close();
                         FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
                         fos2.write((R.color.black+"").getBytes());
+                        fos2.flush();
                         fos2.close();
                     } catch (FileNotFoundException e) {
                         e.printStackTrace();
@@ -95,12 +105,13 @@ public class Login extends AppCompatActivity {
         });
     }
 
-    public class UserLoginTask extends AsyncTask<String, Void, String> {
+    public class UserLoginTask extends AsyncTask<String, Void, Boolean> {
         // http://findme-env.elasticbeanstalk.com/userlogin.php
 
         String username = "";
         String password = "";
         int color_value = 0;
+        int result;
 
         public UserLoginTask(String username, String password) {
             this.username = username;
@@ -108,8 +119,7 @@ public class Login extends AppCompatActivity {
         }
 
         @Override
-        protected String doInBackground(String... url) {
-            String result;
+        protected Boolean doInBackground(String... url) {
             try {
                 URL urlname = new URL(url[0]);
                 HttpURLConnection conn = (HttpURLConnection) urlname.openConnection();
@@ -155,55 +165,63 @@ public class Login extends AppCompatActivity {
                     jsonObject = new JSONObject(json);
                 } catch (JSONException e) {
                     Log.e("JSONException", e.getMessage());
+                    return false;
                 }
 
                 color_value = jsonObject.getInt("color");
 
-                result = conn.getResponseCode()+"";
+                result = conn.getResponseCode();
                 conn.disconnect();
 
             } catch (MalformedURLException e) {
                 Log.e("MalformedURL", e.getMessage());
-                return e.getMessage();
+                return false;
             } catch (IOException e) {
                 Log.e("IOException", e.getMessage());
-                return e.getMessage();
+                return false;
             } catch (JSONException e) {
                 Log.e("JSONException", e.getMessage());
-                return e.getMessage();
+                return false;
             }
 
-            return result;
+            return true;
         }
 
-        protected void onPostExecute(String result) {
-            if(result.equals("200")) {
-                // successful login
-                ((MyApplication) getApplication()).setUser(new UserData(username,color_value));
+        protected void onPostExecute(Boolean noExceptions) {
+            if (noExceptions) {
+                if(result == 200) {
+                    // successful login
+                    ((MyApplication) getApplication()).setUser(new UserData(username,color_value));
 
-                try {
-                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
-                    fos.write(username.getBytes());
-                    fos.close();
-                    FileOutputStream fos2 = openFileOutput("usercolor", Context.MODE_PRIVATE);
-                    fos2.write((color_value+"").getBytes());
-                    fos2.close();
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    try {
+                        FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                        fos.write(username.getBytes());
+                        fos.flush();
+                        fos.close();
+                        FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                        fos2.write((color_value + "").getBytes());
+                        fos2.flush();
+                        fos2.close();
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent intent = new Intent(Login.this, MainActivity.class);
+                    startActivity(intent);
                 }
-
-                Intent intent = new Intent(Login.this, MainActivity.class);
-                startActivity(intent);
-            }
-            else if(result.equals("400")) {
-                // incorrect login
-                alert("Incorrect username or password. Please try again.");
+                else if(result == 400) {
+                    // incorrect login
+                    alert("Incorrect username or password. Please try again.");
+                }
+                else {
+                    // no login received
+                    alert("Please fill in your username and password");
+                }
             }
             else {
-                // unknown error
-                alert("Please fill in your username and password");
+                alert("Incorrect username or password. Please try again.");
             }
         }
     }

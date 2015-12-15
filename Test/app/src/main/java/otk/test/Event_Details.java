@@ -251,9 +251,6 @@ public class Event_Details extends AppCompatActivity implements OnStreetViewPano
                         " / " + maxAttendees);
             }
 
-            Log.e("Logged in user", loggedInUser);
-            Log.e("Event creator", sampleData.getCreator());
-
             if (sampleData.getCreator().equals(loggedInUser) == true ||
                     sampleData.getAttendees().contains(loggedInUser) == true ||
                     (    sampleData.getMaxAttendees() > 0 &&
@@ -477,7 +474,7 @@ public class Event_Details extends AppCompatActivity implements OnStreetViewPano
                 inputStream.close();
                 json = stringBuilder.toString();
             } catch (UnsupportedEncodingException e) {
-                Log.e("UnsupportedEncoding", e.getMessage());
+                //Log.e("UnsupportedEncoding", e.getMessage());
             } catch (IOException e) {
                 Log.e("IOException", e.getMessage());
             }

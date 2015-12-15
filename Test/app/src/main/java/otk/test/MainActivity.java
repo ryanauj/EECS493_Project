@@ -12,6 +12,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -54,6 +55,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.security.Permission;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -92,68 +94,101 @@ public class MainActivity extends AppCompatActivity implements
 
         Log.d("APP STARTED", "HELLO");
 
-        // check for logged in user through
-        if (fileExists("userdata") && fileExists("colordata")) {
-            String username = null;
-            int color = 0;
-            try {
-                FileInputStream fis = openFileInput("userdata");
-                byte[] input = new byte[fis.available()];
-                int count = 0;
-                while (fis.read(input) != -1 && count < 1000) {
-                    count = count + 1;
-                }
-                if (count >= 1000) {
-                    Log.e("inf loop1", "inf loop occurred in userdata");
-                }
-                username = new String(input);
-                fis.close();
+        // check if app was freshly opened
+        if (((MyApplication) getApplication()).getUser().getUserName().equals("App Opened")) {
+            Log.e("fresh", "opened up freshly");
 
-                FileInputStream fis2 = openFileInput("colordata");
-                byte[] colorinput = new byte[fis2.available()];
-                count = 0;
-                while (fis2.read(colorinput) != -1 && count < 1000) {
-                    count = count + 1;
-                }
-                if (count >= 1000) {
-                    Log.e("inf loop2", "inf loop occurred in colordata");
-                }
-                color = Integer.valueOf(new String(colorinput));
-                fis2.close();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(MainActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
             }
-            if (username != null && !username.equals("Not Logged In") && color != 0) {
-                ((MyApplication) getApplication()).setUser(new UserData(username, color));
+
+            // check for logged in user through stored files
+            if (fileExists("userdata") && fileExists("colordata")) {
+                Log.d("app","both files exist");
+                String username = null;
+                int color = 0;
+                try {
+                    FileInputStream fis = openFileInput("userdata");
+                    byte[] input = new byte[fis.available()];
+                    int count = 0;
+                    while (fis.read(input) != -1 && count < 2000) {
+                        count = count + 1;
+                    }
+                    if (count >= 1000) {
+                        Log.e("inf loop1", "inf loop occurred in userdata");
+                    }
+                    username = new String(input);
+                    fis.close();
+
+                    FileInputStream fis2 = openFileInput("colordata");
+                    byte[] colorinput = new byte[fis2.available()];
+                    count = 0;
+                    while (fis2.read(colorinput) != -1 && count < 1000) {
+                        count = count + 1;
+                    }
+                    if (count >= 1000) {
+                        Log.e("inf loop2", "inf loop occurred in colordata");
+                    }
+                    Log.d("colorinput",new String(colorinput));
+                    color = Integer.valueOf(new String(colorinput));
+                    fis2.close();
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                Log.d("username",username);
+                Log.d("color",color+" ");
+                if (username != null && !username.equals("Not Logged In")) {
+                    ((MyApplication) getApplication()).setUser(new UserData(username, color));
+                } else {
+                    // re-route to login
+                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In", R.color.black));
+                    Intent intent = new Intent(MainActivity.this, Login.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                }
             } else {
-                // re-route to login
-                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In",0));
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-                finish();
-            }
-        } else {
-            // create files
-            try {
-                FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
-                fos.write("Not Logged In".getBytes());
-                fos.close();
-                FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
-                fos2.write((R.color.black+"").getBytes());
-                fos2.close();
+                // create files
+                Log.d("app","file not found");
+                try {
+                    FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
+                    fos.write("Not Logged In".getBytes());
+                    fos.flush();
+                    fos.close();
+                    FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
+                    fos2.write((R.color.black + "").getBytes());
+                    fos2.flush();
+                    fos2.close();
 
-                // re-route to login
-                Intent intent = new Intent(MainActivity.this, Login.class);
-                startActivity(intent);
-                finish();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    // re-route to login
+                    ((MyApplication) getApplication()).setUser(new UserData("Not Logged In", R.color.black));
+                    Intent intent = new Intent(MainActivity.this, Login.class);
+                    startActivity(intent);
+                    finish();
+                    return;
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        else {
+            // app still active
+            if (((MyApplication) getApplication()).getUser().getUserName().equals("Not Logged In")) {
+                // re-route to login
+                Intent intent = new Intent(MainActivity.this, Login.class);
+                startActivity(intent);
+                finish();
+                return;
+            }
+        }
+
+        Log.d("app","moving on");
+        Log.d("user",((MyApplication) getApplication()).getUser().getUserName()+" "+((MyApplication) getApplication()).getUser().getColorValue());
 
         //Initialize Map
         final MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFrag);
@@ -235,14 +270,14 @@ public class MainActivity extends AppCompatActivity implements
         //noinspection SimplifiableIfStatement
         switch (id) {
             case R.id.actionlogout: {
-                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In", 0));
+                ((MyApplication) getApplication()).setUser(new UserData("Not Logged In", R.color.black));
 
                 try {
                     FileOutputStream fos = openFileOutput("userdata", Context.MODE_PRIVATE);
                     fos.write("Not Logged In".getBytes());
                     fos.close();
                     FileOutputStream fos2 = openFileOutput("colordata", Context.MODE_PRIVATE);
-                    fos2.write("0".getBytes());
+                    fos2.write((R.color.black+"").getBytes());
                     fos2.close();
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -406,12 +441,11 @@ public class MainActivity extends AppCompatActivity implements
                         mapClass.mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
                     }
                     catch (SecurityException e) {
-                        Log.e("Security",e.getMessage());
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                        Log.e("Security", e.getMessage());
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                        }
                     }
                     mapClass.LocProvider = "GPS_PROVIDER";
                     Toast.makeText(getApplicationContext(), "GPS Services are being used", Toast.LENGTH_LONG).show();
@@ -421,12 +455,11 @@ public class MainActivity extends AppCompatActivity implements
                         mapClass.mLocationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, this);
                     }
                     catch (SecurityException e) {
-                        Log.e("Security",e.getMessage());
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-                        ActivityCompat.requestPermissions(MainActivity.this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                        Log.e("Security", e.getMessage());
+                        if (Build.VERSION.SDK_INT >= 23) {
+                            ActivityCompat.requestPermissions(MainActivity.this,
+                                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                        }
                     }
                     mapClass.LocProvider = "NETWORK_PROVIDER";
                     Toast.makeText(getApplicationContext(), "Network Services are being used", Toast.LENGTH_LONG).show();

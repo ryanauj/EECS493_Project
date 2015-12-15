@@ -13,6 +13,7 @@ import android.location.Location;
 
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Vibrator;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -66,16 +67,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         // Add a marker in Sydney and move the camera
-
         try {
             prevLocation = mLocationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         } catch (SecurityException e) {
+            if (Build.VERSION.SDK_INT >= 23) {
+                ActivityCompat.requestPermissions(MapsActivity.this,
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+            }
             Log.e("security", e.getMessage());
-            ActivityCompat.requestPermissions(MapsActivity.this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-            ActivityCompat.requestPermissions(MapsActivity.this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
         }
         if (prevLocation != null) {
             LatLng cur_loc = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
@@ -98,12 +97,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 prevLocation = mLocationManager.getLastKnownLocation(LocProvider);
             }
             catch (SecurityException e) {
-                Log.e("Security",e.getMessage());
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    ActivityCompat.requestPermissions(MapsActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                }
+                Log.e("security", e.getMessage());
             }
             if (prevLocation != null) {
                 LatLng pos = new LatLng(prevLocation.getLatitude(), prevLocation.getLongitude());
@@ -119,12 +117,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 location = mLocationManager.getLastKnownLocation(LocProvider);
             }
             catch (SecurityException e) {
-                Log.e("Security",e.getMessage());
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 123);
-
-                ActivityCompat.requestPermissions(MapsActivity.this,
-                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 123);
+                if (Build.VERSION.SDK_INT >= 23) {
+                    ActivityCompat.requestPermissions(MapsActivity.this,
+                            new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.ACCESS_COARSE_LOCATION}, 0);
+                }
+                Log.e("security", e.getMessage());
             }
             if (location != null) {
                 return new LatLng(location.getLatitude(),location.getLongitude());
