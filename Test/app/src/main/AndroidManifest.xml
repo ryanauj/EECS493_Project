@@ -56,8 +56,6 @@
             android:label="Create Event"
             android:theme="@style/Theme.AppCompat.Light.DarkActionBar" >
         </activity>
-        <activity android:name=".testconnection" >
-        </activity>
         <activity android:name=".Login" >
         </activity>
         <activity android:name=".CreateUser" >
